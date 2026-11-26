@@ -18,10 +18,10 @@ jobs:
     strategy:
       matrix:
         os:
-          - runs-on: windows-2022
+          - runs-on: windows-2025
             vcpkg-triplet: x86-windows-static
             suffix: ci-windows
-          - runs-on: ubuntu-22.04
+          - runs-on: ubuntu-26.04
             vcpkg-triplet: x86-linux
             suffix: ci-linux
         target: [server]
@@ -37,13 +37,13 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7.0.1
         with:
           submodules: recursive
           fetch-depth: 0 # Required for automatic versioning
       
       - name: Install Ubuntu packages
-        if: matrix.os.runs-on == 'ubuntu-22.04'
+        if: matrix.os.runs-on == 'ubuntu-26.04'
         run: |
           sudo dpkg --add-architecture i386
           sudo apt update || true
@@ -51,7 +51,7 @@ jobs:
 
       # Restore artifacts, or setup vcpkg for building artifacts
       - name: Set up vcpkg
-        uses: lukka/run-vcpkg@v11
+        uses: lukka/run-vcpkg@v11.6
         id: runvcpkg
         with:
           vcpkgJsonGlob: 'vcpkg.json'
@@ -60,11 +60,11 @@ jobs:
           runVcpkgInstall: false
       
       - name: Set up rust
-        uses: actions-rust-lang/setup-rust-toolchain@v1.15.0
+        uses: actions-rust-lang/setup-rust-toolchain@v2.0.1
 
       # Run CMake+vcpkg+Ninja+CTest to generate/build/test.
       - name: Build and Test with CMake
-        uses: lukka/run-cmake@v10
+        uses: lukka/run-cmake@v10.9
         id: runcmake
         with:
           configurePreset: github-actions
@@ -90,7 +90,7 @@ jobs:
           --artifact-dir ${{github.workspace}}/_build/ci-artifact
           --target ${{ matrix.target }}
           --suffix ${{ matrix.os.suffix }}
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7.0.2
         with:
           name: ${{ steps.prepare_artifact.outputs.artifact_name }}
           path: ${{github.workspace}}/_build/ci-artifact/${{ steps.prepare_artifact.outputs.artifact_name }}
@@ -98,11 +98,11 @@ jobs:
   package:
     name: "Package Release"
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
 
     steps:
       - name: Download all artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8.0.2
         with:
           path: artifacts
 
@@ -112,14 +112,14 @@ jobs:
           cp artifacts/AG-server-ci-linux/ag_addon/addons/amxmodx/configs/hamdata.ini artifacts/AG-server-ci-windows/ag_addon/addons/amxmodx/configs/hamdata.ini
 
       - name: Upload Windows Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: AG-server-ci-windows
           path: artifacts/AG-server-ci-windows
           overwrite: true
 
       - name: Upload Linux Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: AG-server-ci-linux
           path: artifacts/AG-server-ci-linux
