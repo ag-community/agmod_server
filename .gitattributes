@@ -1,2 +1,10 @@
-# Checkout gamedir files with LF line endings on all platforms
+# Checkout gamedir text files with LF line endings on all platforms
 /gamedir/* text eol=lf
+
+# gamedir binary assets must never be normalized
+/gamedir/*.wad binary
+/gamedir/*.bsp binary
+/gamedir/*.mdl binary
+/gamedir/*.spr binary
+/gamedir/*.wav binary
+/gamedir/*.tga binary
