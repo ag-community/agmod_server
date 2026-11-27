@@ -1,21 +1,27 @@
-# CMake build directory
+# Build directories
 /build
 /build_*
 /_build
 /_build_*
-CMakeUserPresets.json
 
 # macOS garbage
 .DS_Store
 
-# Ignore .vscode but allow examples
+# Ignore .vscode but allow settings, tasks and examples
 .vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
 !.vscode/**/*.example.*
 
-# CI stuff
-/vcpkg
+# Zed
+.zed/*
+!.zed/tasks.json
 
 # Nix
 /.direnv
 /result
 /result-*
+
+# xmake
+/.xmake
+/compile_commands.json

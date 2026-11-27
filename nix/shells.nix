@@ -7,23 +7,20 @@
     }:
     let
       i686 = pkgs.pkgsi686Linux;
-
-      vcpkgTripletEnv = ''
-        export VCPKG_DEFAULT_TRIPLET=x86-linux
-        export VCPKG_DEFAULT_HOST_TRIPLET=x86-linux
-        export VCPKG_FORCE_SYSTEM_BINARIES=1
-      '';
     in
     {
       devShells.default = pkgs.mkShell {
         packages = [
-          pkgs.cmake
-          pkgs.ninja
           pkgs.gnumake
           pkgs.pkg-config
           pkgs.git
           pkgs.python3
-          pkgs.vcpkg
+          pkgs.curl
+          pkgs.unzip
+          pkgs.xmake
+          pkgs.just
+          pkgs.cargo
+          pkgs.rustc
           pkgs.clang-tools
           pkgs.pre-commit
           pkgs.nixfmt
@@ -33,33 +30,39 @@
         ];
 
         shellHook = ''
-          ${vcpkgTripletEnv}
-
-          if [ -d "$PWD/vcpkg/scripts/buildsystems" ]; then
-            export VCPKG_ROOT="$PWD/vcpkg"
-          fi
+          export AG_HOST_CC="${pkgs.gcc}/bin/gcc"
+          export AG_HOST_CXX="${pkgs.gcc}/bin/g++"
+          export AG_CARGO="${pkgs.cargo}/bin/cargo"
+          export AG_RUSTC="${pkgs.rustc}/bin/rustc"
+          export AG_PATCHELF="${pkgs.patchelf}/bin/patchelf"
+          export AG_GLIBC_LIB="${pkgs.glibc.out}/lib"
+          export AG_CXX_RUNTIME_LIB="${pkgs.gcc.cc.lib}/lib"
 
           echo "AG server (Half-Life 1) - 32-bit x86"
-          echo "  git submodule update --init --recursive        # fetch source_sdk"
-          echo "  git clone https://github.com/microsoft/vcpkg vcpkg"
-          echo "  export VCPKG_ROOT=\"\$PWD/vcpkg\""
-          echo "  cmake --preset github-actions"
-          echo "  cmake --build --preset github-actions --target ci-server"
+          echo "  just build                  # debug"
+          echo "  just release                # release"
+          echo "  just amxx-offsets           # AMXX gamedata"
+          echo "  just hamdata                # hamdata.ini (Linux)"
+          echo "  just dist <mod-dir>         # install ag.so + gamedir assets"
         '';
       };
 
       devShells.release = releasePkgs.mkShell {
         packages = [
-          releasePkgs.cmake
-          releasePkgs.ninja
           releasePkgs.gnumake
           releasePkgs.pkg-config
           releasePkgs.git
+          releasePkgs.python3
+          releasePkgs.curl
+          releasePkgs.unzip
+          releasePkgs.xmake
+          releasePkgs.just
+          releasePkgs.cargo
+          releasePkgs.rustc
           releasePkgs.pkgsi686Linux.gcc
         ];
 
         shellHook = ''
-          ${vcpkgTripletEnv}
           echo "AG server / release - 32-bit x86, older glibc from nixos-24.05"
         '';
       };

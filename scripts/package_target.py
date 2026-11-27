@@ -5,9 +5,9 @@ import shutil
 from pathlib import Path
 
 def main():
-    parser = argparse.ArgumentParser(description='Prepares CMake install results for zipping')
-    parser.add_argument('--build-dir', required=True, help='CMake build directory')
-    parser.add_argument('--install-dir', required=True, help='CMake install directory')
+    parser = argparse.ArgumentParser(description='Prepares install results for zipping')
+    parser.add_argument('--build-dir', required=True, help='Build directory')
+    parser.add_argument('--install-dir', required=True, help='Install directory')
     parser.add_argument('--artifact-dir', required=True, help='Output artifact directory. A new directory will be created there')
     parser.add_argument('--target', required=True, choices=('client', 'server'), help='Target type for packaging')
     parser.add_argument('--suffix', required=True, help='Name suffix')
