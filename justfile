@@ -21,7 +21,6 @@ hamdata:
     xmake hamdata
 
 clean:
-    -xmake clean -a
     rm -rf build .xmake
 
 dist prefix mode="release":
