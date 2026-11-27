@@ -39,11 +39,7 @@
           export AG_CXX_RUNTIME_LIB="${pkgs.gcc.cc.lib}/lib"
 
           echo "AG server (Half-Life 1) - 32-bit x86"
-          echo "  just build                  # debug"
-          echo "  just release                # release"
-          echo "  just amxx-offsets           # AMXX gamedata"
-          echo "  just hamdata                # hamdata.ini (Linux)"
-          echo "  just dist <mod-dir>         # install ag.so + gamedir assets"
+          just --list 2>/dev/null || true
         '';
       };
 
@@ -64,6 +60,7 @@
 
         shellHook = ''
           echo "AG server / release - 32-bit x86, older glibc from nixos-24.05"
+          just --list 2>/dev/null || true
         '';
       };
     };
