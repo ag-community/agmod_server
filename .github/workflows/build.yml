@@ -41,7 +41,7 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0 # Required for automatic versioning
           persist-credentials: false
@@ -54,13 +54,13 @@ jobs:
           sudo apt install -y libc6:i386 linux-libc-dev:i386 gcc-multilib g++-multilib make unzip
 
       - name: Set up xmake
-        uses: xmake-io/github-action-setup-xmake@v1.2.5
+        uses: xmake-io/github-action-setup-xmake@3a1a5dddfc7fa625d9a698738334bf55655a861a # v1.2.5
         with:
           xmake-version: "3.1.2"
 
       - name: Set up rust
         if: matrix.os.plat == 'linux'
-        uses: actions-rust-lang/setup-rust-toolchain@v2.0.1
+        uses: actions-rust-lang/setup-rust-toolchain@a188e68d0fd2bd36ad51dccb2b07ba6e75105f30 # v2.0.1
 
       - name: Configure
         run: xmake f -y -p ${{ matrix.os.plat }} -a ${{ matrix.os.arch }} -m releasedbg -c
@@ -89,7 +89,7 @@ jobs:
           --artifact-dir ${{ github.workspace }}/_build/ci-artifact
           --target ${{ matrix.target }}
           --suffix ${{ matrix.os.suffix }}
-      - uses: actions/upload-artifact@v7.0.2
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: ${{ steps.prepare_artifact.outputs.artifact_name }}
           path: ${{github.workspace}}/_build/ci-artifact/${{ steps.prepare_artifact.outputs.artifact_name }}
@@ -101,7 +101,7 @@ jobs:
 
     steps:
       - name: Download all artifacts
-        uses: actions/download-artifact@v8.0.2
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           path: artifacts
 
@@ -111,14 +111,14 @@ jobs:
           cp artifacts/AG-server-ci-linux/ag_addon/addons/amxmodx/configs/hamdata.ini artifacts/AG-server-ci-windows/ag_addon/addons/amxmodx/configs/hamdata.ini
 
       - name: Upload Windows Artifact
-        uses: actions/upload-artifact@v7.0.2
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: AG-server-ci-windows
           path: artifacts/AG-server-ci-windows
           overwrite: true
 
       - name: Upload Linux Artifact
-        uses: actions/upload-artifact@v7.0.2
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: AG-server-ci-linux
           path: artifacts/AG-server-ci-linux
