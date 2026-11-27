@@ -10,7 +10,7 @@ task("amxx-offsets")
         import("core.project.config")
         import("lib.detect.find_tool")
         import("net.http")
-        import("utils.archive")
+        import("utils.archive.extract")
         -- xmake doesn't load the build config for tasks.
         config.load()
 
@@ -48,7 +48,7 @@ task("amxx-offsets")
         end
 
         if not os.isdir(source) then
-            archive.extract(archive, cache)
+            extract.main(archive, cache)
         end
 
         local class_list = path.join(projectdir, "src", "game", "server", "AmxxOffsetClassList.txt")
