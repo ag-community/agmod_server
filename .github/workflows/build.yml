@@ -39,7 +39,7 @@ jobs:
           fetch-depth: 0 # Required for automatic versioning
       
       - name: Install Ubuntu packages
-        if: matrix.plat == 'linux'
+        if: matrix.os.plat == 'linux'
         run: |
           sudo dpkg --add-architecture i386
           sudo apt update || true
@@ -51,11 +51,11 @@ jobs:
           xmake-version: "3.1.2"
 
       - name: Set up rust
-        if: matrix.plat == 'linux'
+        if: matrix.os.plat == 'linux'
         uses: actions-rust-lang/setup-rust-toolchain@v2.0.1
 
       - name: Configure
-        run: xmake f -y -p ${{ matrix.plat }} -a ${{ matrix.arch }} -m releasedbg -c
+        run: xmake f -y -p ${{ matrix.os.plat }} -a ${{ matrix.os.arch }} -m releasedbg -c
 
       - name: Build
         run: xmake -y
@@ -64,7 +64,7 @@ jobs:
         run: xmake amxx-offsets
 
       - name: Generate hamdata.ini
-        if: matrix.plat == 'linux'
+        if: matrix.os.plat == 'linux'
         run: xmake hamdata
 
       # Install
