@@ -36,37 +36,49 @@ jobs:
           fetch-depth: 0 # Required for automatic versioning
           persist-credentials: false
 
-      - name: Install Ubuntu packages
+      - name: Setup Nix
         if: matrix.os.plat == 'linux'
-        run: |
-          sudo dpkg --add-architecture i386
-          sudo apt update || true
-          sudo apt install -y libc6:i386 linux-libc-dev:i386 gcc-multilib g++-multilib make unzip
+        uses: nixbuild/nix-quick-install-action@v35
+
+      - name: Cache Nix
+        if: matrix.os.plat == 'linux'
+        uses: nix-community/cache-nix-action@v7.0.2
+        with:
+          primary-key: nix-${{ runner.os }}-${{ hashFiles('**/flake.lock') }}
 
       - name: Set up xmake
+        if: matrix.os.plat == 'windows'
         uses: xmake-io/github-action-setup-xmake@3a1a5dddfc7fa625d9a698738334bf55655a861a # v1.2.5
         with:
           xmake-version: "3.1.2"
 
-      - name: Set up rust
+      - name: Build (Linux, Nix)
         if: matrix.os.plat == 'linux'
-        uses: actions-rust-lang/setup-rust-toolchain@a188e68d0fd2bd36ad51dccb2b07ba6e75105f30 # v2.0.1
+        shell: bash
+        run: |
+          nix develop --command bash -c '
+            set -euo pipefail
+            xmake f -y -p linux -a i386 -m releasedbg -c
+            xmake -y
+            xmake amxx-offsets
+            xmake hamdata
+            xmake install -o "${{ github.workspace }}/_build/ci-install"
+          '
 
-      - name: Configure
+      - name: Configure (Windows)
+        if: matrix.os.plat == 'windows'
         run: xmake f -y -p ${{ matrix.os.plat }} -a ${{ matrix.os.arch }} -m releasedbg -c
 
-      - name: Build
+      - name: Build (Windows)
+        if: matrix.os.plat == 'windows'
         run: xmake -y
 
-      - name: Generate AMXX offsets
+      - name: Generate AMXX offsets (Windows)
+        if: matrix.os.plat == 'windows'
         run: xmake amxx-offsets
 
-      - name: Generate hamdata.ini
-        if: matrix.os.plat == 'linux'
-        run: xmake hamdata
-
-      # Install
-      - name: Install
+      - name: Install (Windows)
+        if: matrix.os.plat == 'windows'
         run: xmake install -o ${{ github.workspace }}/_build/ci-install
 
       # Prepare and Upload Artifact

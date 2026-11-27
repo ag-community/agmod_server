@@ -4,7 +4,10 @@
   inputs = {
     flake-parts.url = "github:hercules-ci/flake-parts";
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
-    nixpkgs-release.url = "github:nixos/nixpkgs/nixos-24.05";
+    nixpkgs-release = {
+      url = "https://channels.nixos.org/nixos-20.09/nixexprs.tar.xz";
+      flake = false;
+    };
   };
 
   outputs = inputs@{ flake-parts, nixpkgs-release, ... }:
@@ -15,7 +18,7 @@
 
       perSystem = { system, ... }: {
         _module.args.pkgs = import inputs.nixpkgs { inherit system; };
-        _module.args.releasePkgs = import nixpkgs-release { inherit system; };
+        _module.args.releasePkgs = import "${nixpkgs-release}/nixpkgs" { inherit system; };
       };
     };
 }
