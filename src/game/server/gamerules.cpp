@@ -337,14 +337,6 @@ AgGameRules *InstallGameRules(void)
 	SERVER_COMMAND("exec game.cfg\n");
 	SERVER_EXECUTE_HL();
 
-	//++ BulliT
-	char *servercfgfile = (char *)CVAR_GET_STRING("servercfgfile");
-	if (servercfgfile && servercfgfile[0])
-	{
-		ALERT(at_console, "Executing dedicated server config file\n");
-		SERVER_COMMAND(UTIL_VarArgs("exec %s\n", servercfgfile));
-		SERVER_EXECUTE_HL();
-	}
 	CVar::StopRecordingServerChanges();
 
 	if (ag_gamemode_auto.value > 0.0f)
