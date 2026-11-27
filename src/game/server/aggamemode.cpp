@@ -263,17 +263,21 @@ void AgGameMode::Think()
 		if (!changedCVars.empty())
 			numAsterisks = (changedCVars.size() / 5) + 1;
 
-		if (g_pGame->m_iAsterisks > 0)
-		{
-			// Remove previous asterisks
-			g_pGame->m_sName = g_pGame->m_sName.substr(0, g_pGame->m_sName.length() - g_pGame->m_iAsterisks);
-		}
-
-		if (numAsterisks > 0)
-			g_pGame->m_sName.insert(g_pGame->m_sName.end(), numAsterisks, '*');
-
 		m_fNextCvarCheck = gpGlobals->time + CVARS_CHECK_INTERVAL;
-		g_pGame->m_iAsterisks = numAsterisks;
+
+		if (g_pGame)
+		{
+			if (g_pGame->m_iAsterisks > 0)
+			{
+				// Remove previous asterisks
+				g_pGame->m_sName = g_pGame->m_sName.substr(0, g_pGame->m_sName.length() - g_pGame->m_iAsterisks);
+			}
+
+			if (numAsterisks > 0)
+				g_pGame->m_sName.insert(g_pGame->m_sName.end(), numAsterisks, '*');
+
+			g_pGame->m_iAsterisks = numAsterisks;
+		}
 	}
 }
 
