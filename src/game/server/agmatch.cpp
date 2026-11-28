@@ -67,13 +67,13 @@ void AgMatch::Think()
 	  AgSay(NULL,"Game is paused!\n",&m_fNextSay,5,0.4);
 	}
 	*/
-	else if (0 == timelimit.value && 0 == fraglimit.value)
+	else if (0 == timelimit.GetFloat() && 0 == fraglimit.GetFloat())
 	{
 		// Stop the match since it could go on forever.
 		Abort();
 	}
 
-	if (ag_match_running.value != 0.0f && ag_restrict_vote.value == 1.0f && m_fMatchStart < 0.0f)
+	if (ag_match_running.GetBool() && ag_restrict_vote.GetBool() && m_fMatchStart < 0.0f)
 	{
 		std::vector<CBasePlayer *> matchPlayers;
 
@@ -104,7 +104,7 @@ void AgMatch::Think()
 
 void AgMatch::Start(const AgString &sSpawn)
 {
-	if (m_fMatchStart > 0 || 0 == timelimit.value && 0 == fraglimit.value)
+	if (m_fMatchStart > 0 || 0 == timelimit.GetFloat() && 0 == fraglimit.GetFloat())
 		return;
 
 	std::vector<CBasePlayer *> matchPlayers;
@@ -120,9 +120,9 @@ void AgMatch::Start(const AgString &sSpawn)
 		}
 	}
 
-	if (matchPlayers.size() < static_cast<unsigned int>(ag_start_minplayers.value))
+	if (matchPlayers.size() < static_cast<unsigned int>(ag_start_minplayers.GetInt()))
 	{
-		UTIL_ClientPrintAll(HUD_PRINTCENTER, UTIL_VarArgs("You need %d players to start a game on this server.", (int)ag_start_minplayers.value));
+		UTIL_ClientPrintAll(HUD_PRINTCENTER, UTIL_VarArgs("You need %d players to start a game on this server.", (int)ag_start_minplayers.GetInt()));
 		return;
 	}
 

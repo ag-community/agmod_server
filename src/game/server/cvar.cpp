@@ -275,13 +275,20 @@ namespace
 	}
 }
 
-cvar_t Create(char *name, char *value, int flags, int customFlags)
+void Track(const char *name, const char *value, int flags, int customFlags)
 {
-	cvar_t var = { name, value, flags };
+	cvar_t var = { const_cast<char *>(name), const_cast<char *>(value), flags };
+	CustomCVar custom(var, customFlags);
 
-	auto cvars = CVar(name, CustomCVar(var, customFlags));
+	CVar(std::string(name), custom);
 
-	return var;
+	if (!cvars.empty())
+		cvars.emplace(name, custom);
+}
+
+void TrackOnly(const char *name, const char *value, int flags, int customFlags)
+{
+	Track(name, value, flags, customFlags);
 }
 
 void Load()
@@ -439,7 +446,7 @@ void RestoreAllToGamemodeValue()
 
 void IgnoreLogging()
 {
-	if (ag_log_cvars.value == 3.0f)
+	if (ag_log_cvars.GetInt() == 3)
 		return;
 
 	for (const auto entry : cvars)
@@ -478,4 +485,31 @@ void RestoreLogging()
 
 	isIgnoringLog = false;
 }
+}
+
+AgConVar::AgConVar(const char *name, const char *def, int flags, int customFlags, const char *desc)
+    : ConVar(name, def, flags, desc)
+    , m_CustomFlags(customFlags)
+{
+	CVar::Track(name, def, flags, customFlags);
+}
+
+bool AgConVar::IsVotable() const
+{
+	return m_CustomFlags & CCVAR_VOTABLE;
+}
+
+bool AgConVar::IsBasicSetting() const
+{
+	return m_CustomFlags & CCVAR_BASIC_PRIVILEGES;
+}
+
+bool AgConVar::IsGamemode() const
+{
+	return m_CustomFlags & CCVAR_GAMEMODE;
+}
+
+int AgConVar::GetCustomFlags() const
+{
+	return m_CustomFlags;
 }

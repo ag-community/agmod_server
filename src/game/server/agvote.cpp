@@ -73,7 +73,7 @@ bool AgVote::HandleCommand(CBasePlayer *pPlayer)
 	if (!g_pGameRules || 0 == CMD_ARGC())
 		return false;
 
-	if (1 > ag_allow_vote.value)
+	if (!ag_allow_vote.GetBool())
 		return false;
 
 	if (FStrEq(CMD_ARGV(0), "help"))
@@ -174,7 +174,7 @@ bool AgVote::HandleCommand(CBasePlayer *pPlayer)
 			// Check map
 			if (FStrEq(m_sVote.c_str(), "agmap") || FStrEq(m_sVote.c_str(), "changelevel") || FStrEq(m_sVote.c_str(), "map"))
 			{
-				if (!ag_vote_map.value)
+				if (!ag_vote_map.GetBool())
 				{
 					AgConsole("Vote is not allowed by server admin.", pPlayer);
 					return true;
@@ -197,7 +197,7 @@ bool AgVote::HandleCommand(CBasePlayer *pPlayer)
 			// Check nextmap
 			else if (FStrEq(m_sVote.c_str(), "agnextmap"))
 			{
-				if (!ag_vote_map.value)
+				if (!ag_vote_map.GetBool())
 				{
 					AgConsole("Vote is not allowed by server admin.", pPlayer);
 					return true;
@@ -219,7 +219,7 @@ bool AgVote::HandleCommand(CBasePlayer *pPlayer)
 			// Check mode
 			else if (GameMode.IsGamemode(m_sVote))
 			{
-				if (!ag_vote_gamemode.value)
+				if (!ag_vote_gamemode.GetBool())
 				{
 					AgConsole("Vote is not allowed by server admin.", pPlayer);
 					return true;
@@ -237,7 +237,7 @@ bool AgVote::HandleCommand(CBasePlayer *pPlayer)
 			// Check nextmode
 			else if (FStrEq(m_sVote.c_str(), "agnextmode"))
 			{
-				if (!ag_vote_gamemode.value)
+				if (!ag_vote_gamemode.GetBool())
 				{
 					AgConsole("Vote is not allowed by server admin.", pPlayer);
 					return true;
@@ -262,7 +262,7 @@ bool AgVote::HandleCommand(CBasePlayer *pPlayer)
 					return true;
 				}
 
-				if (1 > ag_vote_start.value)
+				if (!ag_vote_start.GetBool())
 				{
 					AgConsole("Vote is not allowed by server admin.", pPlayer);
 					return true;
@@ -275,7 +275,7 @@ bool AgVote::HandleCommand(CBasePlayer *pPlayer)
 			else if (FStrEq(m_sVote.c_str(), "agallow") || FStrEq(m_sVote.c_str(), "agkick") || FStrEq(m_sVote.c_str(), "agadmin") || 0 == strncmp(m_sVote.c_str(), "agforceteam", 11) || FStrEq(m_sVote.c_str(), "agforcespectator"))
 			{
 				// TODO: this is ugly, refactor
-				if ((FStrEq(m_sVote.c_str(), "agkick") && 1 > ag_vote_kick.value) || (FStrEq(m_sVote.c_str(), "agadmin") && 1 > ag_vote_admin.value) || (FStrEq(m_sVote.c_str(), "agallow") && 1 > ag_vote_allow.value) || (0 == strncmp(m_sVote.c_str(), "agforceteam", 11) && 1 > ag_vote_team.value) || (FStrEq(m_sVote.c_str(), "agforcespectator") && 1 > ag_vote_spectator.value))
+				if ((FStrEq(m_sVote.c_str(), "agkick") && !ag_vote_kick.GetBool()) || (FStrEq(m_sVote.c_str(), "agadmin") && !ag_vote_admin.GetBool()) || (FStrEq(m_sVote.c_str(), "agallow") && !ag_vote_allow.GetBool()) || (0 == strncmp(m_sVote.c_str(), "agforceteam", 11) && !ag_vote_team.GetBool()) || (FStrEq(m_sVote.c_str(), "agforcespectator") && !ag_vote_spectator.GetBool()))
 				{
 					AgConsole("Vote is not allowed by server admin.", pPlayer);
 					return true;
@@ -316,7 +316,7 @@ bool AgVote::HandleCommand(CBasePlayer *pPlayer)
 			}
 			else if (FStrEq(m_sVote.c_str(), "agmaxtime"))
 			{
-				if (!ag_vote_setting.value)
+				if (!ag_vote_setting.GetInt())
 				{
 					AgConsole("Voting settings is not allowed here.", pPlayer);
 					return true;
@@ -327,12 +327,12 @@ bool AgVote::HandleCommand(CBasePlayer *pPlayer)
 			}
 			else if (FStrEq(m_sVote.c_str(), "agmoretime"))
 			{
-				if (!ag_vote_setting.value)
+				if (!ag_vote_setting.GetInt())
 				{
 					AgConsole("Voting settings is not allowed here.", pPlayer);
 					return true;
 				}
-				if (!ag_vote_extra_timelimit.value)
+				if (!ag_vote_extra_timelimit.GetInt())
 				{
 					AgConsole("Voting for extra timelimit is not allowed here.", pPlayer);
 					return true;
@@ -340,7 +340,7 @@ bool AgVote::HandleCommand(CBasePlayer *pPlayer)
 
 				// Don't allow extending the timelimit too quickly... maybe someone wanted to add days of timelimit by spamming this
 				auto remainingMinutes = CVAR_GET_FLOAT("mp_timeleft") / 60.0f;
-				auto cooldown = remainingMinutes - (ag_vote_extra_timelimit.value / 2.0f);
+				auto cooldown = remainingMinutes - (ag_vote_extra_timelimit.GetInt() / 2.0f);
 				if (cooldown > 0.0f)
 				{
 					AgConsole(UTIL_VarArgs("Can't vote for extended timelimit yet. Please, try again in %d minutes",
@@ -354,12 +354,12 @@ bool AgVote::HandleCommand(CBasePlayer *pPlayer)
 			}
 			else if (FStrEq(m_sVote.c_str(), "spawnbot"))
 			{
-				if (ag_vote_bot.value == 0.0f)
+				if (!ag_vote_bot.GetBool())
 				{
 					AgConsole("Adding bots by vote is not allowed by server admin.", pPlayer);
 					return true;
 				}
-				if (ag_match_running.value != 0.0f && !g_bLangame)
+				if (ag_match_running.GetBool() && !g_bLangame)
 				{
 					AgConsole("Sorry, can't add a bot during a match.", pPlayer);
 					return true;
@@ -377,9 +377,9 @@ bool AgVote::HandleCommand(CBasePlayer *pPlayer)
 						botsCount++;
 				}
 
-				if (botsCount >= ag_bot_limit.value)
+				if (botsCount >= ag_bot_limit.GetInt())
 				{
-					AgConsole(UTIL_VarArgs("The limit of %d bots has been reached", (int)ag_bot_limit.value), pPlayer);
+					AgConsole(UTIL_VarArgs("The limit of %d bots has been reached", (int)ag_bot_limit.GetInt()), pPlayer);
 					return true;
 				}
 
@@ -388,7 +388,7 @@ bool AgVote::HandleCommand(CBasePlayer *pPlayer)
 			}
 			else if (FStrEq(m_sVote.c_str(), "agdefault"))
 			{
-				if (ag_vote_setting.value != 2.0f)
+				if (ag_vote_setting.GetInt() != 2)
 				{
 					AgConsole("Defaulting gamemode cvars is not allowed here.", pPlayer);
 					return true;
@@ -399,7 +399,7 @@ bool AgVote::HandleCommand(CBasePlayer *pPlayer)
 			}
 			else if (0 == strncmp(m_sVote.c_str(), "mp_timelimit", 12))
 			{
-				if (!ag_vote_setting.value)
+				if (!ag_vote_setting.GetInt())
 				{
 					AgConsole("Vote is not allowed by server admin.", pPlayer);
 					return true;
@@ -408,30 +408,30 @@ bool AgVote::HandleCommand(CBasePlayer *pPlayer)
 				// TODO: refactor similar checks for fraglimit and others
 				if (m_sValue.empty())
 				{
-					AgConsole(UTIL_VarArgs("%s is \"%s\"", m_sVote.c_str(), timelimit.string), pPlayer);
+					AgConsole(UTIL_VarArgs("%s is \"%s\"", m_sVote.c_str(), timelimit.GetString()), pPlayer);
 					return true;
 				}
-				else if (m_sValue == "0" && ag_vote_mp_timelimit_high.value > 0.0f)
+				else if (m_sValue == "0" && ag_vote_mp_timelimit_high.GetInt() > 0)
 				{
 					AgConsole(UTIL_VarArgs("Can't vote unlimited time. The max. you can vote is %s.",
-					              ag_vote_mp_timelimit_high.string),
+					              ag_vote_mp_timelimit_high.GetString()),
 					    pPlayer);
 
 					return true;
 				}
 
-				if (atof(m_sValue.c_str()) > ag_vote_mp_timelimit_high.value && ag_vote_mp_timelimit_high.value != 0.0f)
+				if (atof(m_sValue.c_str()) > ag_vote_mp_timelimit_high.GetInt() && ag_vote_mp_timelimit_high.GetInt() != 0)
 				{
 					AgConsole(UTIL_VarArgs("Can't vote this. It's too high of a timelimit. Please, try a lower value. (max time: %s)",
-					              ag_vote_mp_timelimit_high.string),
+					              ag_vote_mp_timelimit_high.GetString()),
 					    pPlayer);
 
 					return true;
 				}
-				else if (atof(m_sValue.c_str()) < ag_vote_mp_timelimit_low.value && m_sValue != "0")
+				else if (atof(m_sValue.c_str()) < ag_vote_mp_timelimit_low.GetInt() && m_sValue != "0")
 				{
 					AgConsole(UTIL_VarArgs("Can't vote this. It's too low of a timelimit. Please, try a higher value. (min time: %s)",
-					              ag_vote_mp_timelimit_low.string),
+					              ag_vote_mp_timelimit_low.GetString()),
 					    pPlayer);
 					return true;
 				}
@@ -440,7 +440,7 @@ bool AgVote::HandleCommand(CBasePlayer *pPlayer)
 			}
 			else if (0 == strncmp(m_sVote.c_str(), "mp_fraglimit", 12))
 			{
-				if (!ag_vote_setting.value)
+				if (!ag_vote_setting.GetInt())
 				{
 					AgConsole("Vote is not allowed by server admin.", pPlayer);
 					return true;
@@ -448,30 +448,30 @@ bool AgVote::HandleCommand(CBasePlayer *pPlayer)
 
 				if (m_sValue.empty())
 				{
-					AgConsole(UTIL_VarArgs("%s is \"%s\"", m_sVote.c_str(), fraglimit.string), pPlayer);
+					AgConsole(UTIL_VarArgs("%s is \"%s\"", m_sVote.c_str(), fraglimit.GetString()), pPlayer);
 					return true;
 				}
-				else if (m_sValue == "0" && ag_vote_mp_fraglimit_high.value > 0.0f)
+				else if (m_sValue == "0" && ag_vote_mp_fraglimit_high.GetInt() > 0)
 				{
 					AgConsole(UTIL_VarArgs("Can't vote unlimited frags. The max. you can vote is %s.",
-					              ag_vote_mp_fraglimit_high.string),
+					              ag_vote_mp_fraglimit_high.GetString()),
 					    pPlayer);
 
 					return true;
 				}
 
-				if (atof(m_sValue.c_str()) > ag_vote_mp_fraglimit_high.value && ag_vote_mp_fraglimit_high.value != 0.0f)
+				if (atof(m_sValue.c_str()) > ag_vote_mp_fraglimit_high.GetInt() && ag_vote_mp_fraglimit_high.GetInt() != 0)
 				{
 					AgConsole(UTIL_VarArgs("Can't vote this. It's too high of a timelimit. Please, try a lower value. (max time: %d)",
-					              ag_vote_mp_fraglimit_high.string),
+					              ag_vote_mp_fraglimit_high.GetString()),
 					    pPlayer);
 
 					return true;
 				}
-				else if (atof(m_sValue.c_str()) < ag_vote_mp_fraglimit_low.value && m_sValue != "0")
+				else if (atof(m_sValue.c_str()) < ag_vote_mp_fraglimit_low.GetInt() && m_sValue != "0")
 				{
 					AgConsole(UTIL_VarArgs("Can't vote this. It's too low of a timelimit. Please, try a higher value. (min time: %d)",
-					              ag_vote_mp_fraglimit_low.string),
+					              ag_vote_mp_fraglimit_low.GetString()),
 					    pPlayer);
 					return true;
 				}
@@ -482,13 +482,13 @@ bool AgVote::HandleCommand(CBasePlayer *pPlayer)
 			{
 				if (CVar::IsBasicSetting(m_sVote))
 				{
-					if (ag_vote_setting.value == 0.0f)
+					if (ag_vote_setting.GetInt() == 0)
 					{
 						AgConsole("Vote is not allowed by server admin.", pPlayer);
 						return true;
 					}
 				}
-				else if (ag_vote_setting.value != 2.0f)
+				else if (ag_vote_setting.GetInt() != 2)
 				{
 					AgConsole("Vote is not allowed by server admin.", pPlayer);
 					return true;
@@ -511,7 +511,7 @@ bool AgVote::HandleCommand(CBasePlayer *pPlayer)
 
 bool AgVote::CallVote(CBasePlayer *pPlayer)
 {
-	if (pPlayer->IsBot() && ag_bot_allow_vote.value == 0)
+	if (pPlayer->IsBot() && !ag_bot_allow_vote.GetBool())
 	{
 		// Bots cannot start votes when sv_ag_bots_allow_vote is 0
 		return false;
@@ -559,7 +559,7 @@ void AgVote::Think()
 			CBasePlayer *pPlayerLoop = AgPlayerByIndex(i);
 			if (pPlayerLoop && !pPlayerLoop->IsProxy())
 			{
-				if (pPlayerLoop->IsBot() && ag_bot_allow_vote.value == 0)
+				if (pPlayerLoop->IsBot() && !ag_bot_allow_vote.GetBool())
 				{
 					// Bots do not take part in votes when sv_ag_bot_allow_vote is 0
 					continue;
@@ -711,7 +711,7 @@ void AgVote::Think()
 				MESSAGE_END();
 
 				ResetVote();
-				m_fNextVote = ag_vote_failed_time.value + AgTime();
+				m_fNextVote = ag_vote_failed_time.GetInt() + AgTime();
 			}
 			else
 			{
@@ -757,10 +757,10 @@ bool AgVote::ResetVote()
 
 bool CBasePlayer::HasVotingRestrictions()
 {
-	if (ag_restrict_vote.value == 0.0f)
+	if (!ag_restrict_vote.GetBool())
 		return false;
 
-	if (ag_restrict_vote.value == 1.0f && ag_match_running.value == 1.0f && IsSpectator())
+	if (ag_restrict_vote.GetBool() && ag_match_running.GetBool() && IsSpectator())
 		return true;
 
 	// There may be ag_restrict_value 2 or higher in the future

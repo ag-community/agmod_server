@@ -106,7 +106,7 @@ CBaseEntity *CSpawnChooser::GetClassicSpawnPoint()
 	if (FNullEnt(pSpot)) // skip over the null point
 		pSpot = UTIL_FindEntityByClassname(pSpot, "info_player_deathmatch");
 
-	if (FNullEnt(pSpot) && singleplayer.value > 0.0f)
+	if (FNullEnt(pSpot) && singleplayer.GetFloat())
 		pSpot = UTIL_FindEntityByClassname(pSpot, "info_player_start");
 
 	CBaseEntity *pFirstSpot = pSpot;
@@ -171,7 +171,7 @@ CBaseEntity *CSpawnChooser::GetHL25SpawnPoint()
 	if (FNullEnt(pSpot)) // skip over the null point
 		pSpot = UTIL_FindEntityByClassname(pSpot, "info_player_deathmatch");
 
-	if (FNullEnt(pSpot) && singleplayer.value > 0.0f)
+	if (FNullEnt(pSpot) && singleplayer.GetFloat())
 		pSpot = UTIL_FindEntityByClassname(pSpot, "info_player_start");
 
 	CBaseEntity *pFirstSpot = pSpot;
@@ -242,7 +242,7 @@ CBaseEntity *CSpawnChooser::GetFarSpawnPoint()
 		idx++;
 	}
 	const auto numberOfFarSpawns = std::max<size_t>(
-	    (unsigned long)std::lround(filteredSpawnPoints.size() * ag_spawn_far_spots.value),
+	    (unsigned long)std::lround(filteredSpawnPoints.size() * ag_spawn_far_spots.GetFloat()),
 	    std::min<size_t>(filteredSpawnPoints.size(), 3));
 
 	ALERT(at_aiconsole, "Number of far spawns to choose a random one from: %d\n", numberOfFarSpawns);
@@ -327,9 +327,9 @@ CBaseEntity *CSpawnChooser::GetPositionAwareSpawnPoint()
 
 	std::vector<int> spotsToSelect;
 	CBaseEntity *pSpot = nullptr;
-	auto total = ag_spawn_pa_safe_chance.value + ag_spawn_pa_audible_chance.value + ag_spawn_pa_visible_chance.value;
+	auto total = ag_spawn_pa_safe_chance.GetFloat() + ag_spawn_pa_audible_chance.GetFloat() + ag_spawn_pa_visible_chance.GetFloat();
 	auto chance = RANDOM_FLOAT(0, total);
-	auto safeChanceLowerBound = ag_spawn_pa_audible_chance.value + ag_spawn_pa_visible_chance.value;
+	auto safeChanceLowerBound = ag_spawn_pa_audible_chance.GetFloat() + ag_spawn_pa_visible_chance.GetFloat();
 
 	ALERT(at_aiconsole, "Chance number: %.2f out of %.2f\n", chance, total);
 	if (chance > safeChanceLowerBound)
@@ -342,7 +342,7 @@ CBaseEntity *CSpawnChooser::GetPositionAwareSpawnPoint()
 
 		spotsToSelect = SelectSpotsFallingBack({ m_safeSpots, m_barelyAudibleSpots, m_audibleSpots, m_visibleSpots });
 	}
-	else if (chance > ag_spawn_pa_visible_chance.value)
+	else if (chance > ag_spawn_pa_visible_chance.GetFloat())
 	{
 		// By default less chance of spawning in a spot that might be audible from some enemy position
 		// Note: the game actually considers lots of world leafs to be potentially audible...
@@ -528,7 +528,7 @@ std::vector<int> CSpawnChooser::GetRecentlyUsedSpots()
 	// last ones we have to discard, and then simply not put them in any list so they can't be chosen
 	const auto totalToDiscard = static_cast<int>(std::min<size_t>(
 	    g_spawnHistory.size(),
-	    static_cast<size_t>(ag_spawn_avoid_last_spots.value * g_spawnPoints.size())));
+	    static_cast<size_t>(ag_spawn_avoid_last_spots.GetFloat() * g_spawnPoints.size())));
 	std::vector<int> result;
 
 	ALERT(at_aiconsole, "Number of spots to ignore: %d\n", totalToDiscard);

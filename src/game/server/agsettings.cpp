@@ -20,7 +20,7 @@ DLL_GLOBAL bool g_bMapchange = false;
 DLL_GLOBAL AgString g_sNextMap;
 DLL_GLOBAL AgString g_sNextRules;
 
-extern cvar_t timeleft, fragsleft;
+extern AgConVar timeleft, fragsleft;
 extern int gmsgNextmap;
 
 AgSettings::AgSettings()
@@ -74,9 +74,9 @@ bool AgSettings::Think()
 	m_fNextCheck = gpGlobals->time + 5.0; // Every 5 seconds.
 
 	// Check if to display next map.
-	if (m_bCheckNextMap && timelimit.value || m_bCheckNextMap && fraglimit.value)
+	if (m_bCheckNextMap && timelimit.GetFloat() || m_bCheckNextMap && fraglimit.GetFloat())
 	{
-		if (timeleft.value && 60 > timeleft.value || fraglimit.value && 2 > fragsleft.value)
+		if (timeleft.GetFloat() && 60 > timeleft.GetFloat() || fraglimit.GetFloat() && 2 > fragsleft.GetInt())
 		{
 			MESSAGE_BEGIN(MSG_BROADCAST, gmsgNextmap);
 			WRITE_STRING(GetNextLevel().c_str());

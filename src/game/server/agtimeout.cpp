@@ -148,7 +148,7 @@ void AgTimeout::Reset()
 
 void AgTimeout::Timeout(CBasePlayer *pPlayer)
 {
-	if (0 < ag_match_running.value && NULL != pPlayer && Inactive == m_State && pPlayer->IsIngame() && !pPlayer->IsSpectator() && ag_allow_timeout.value > 0)
+	if (ag_match_running.GetBool() && NULL != pPlayer && Inactive == m_State && pPlayer->IsIngame() && !pPlayer->IsSpectator() && ag_allow_timeout.GetBool())
 	{
 		// Check if his team got more timeouts.
 		if (!CanTimeout(pPlayer))

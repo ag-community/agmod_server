@@ -167,7 +167,7 @@ void CGauss::PrimaryAttack()
 
 		m_fPrimaryFire = true;
 
-		if (ag_unlimited_uranium.value == 0.0f)
+		if (!ag_unlimited_uranium.GetBool())
 			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] -= 10;
 
 		StartFire();
@@ -196,7 +196,7 @@ void CGauss::PrimaryAttack()
 	m_pPlayer->m_iWeaponVolume = GAUSS_PRIMARY_FIRE_VOLUME;
 	m_fPrimaryFire = true;
 
-	if (ag_unlimited_uranium.value == 0.0f)
+	if (!ag_unlimited_uranium.GetBool())
 		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] -= 2;
 
 	StartFire();
@@ -254,7 +254,7 @@ void CGauss::SecondaryAttack()
 
 		m_fPrimaryFire = false;
 
-		if (ag_unlimited_uranium.value == 0.0f)
+		if (!ag_unlimited_uranium.GetBool())
 			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--; // take one ammo just to start the spin
 
 		m_pPlayer->m_flNextAmmoBurn = UTIL_WeaponTimeBase();
@@ -289,7 +289,7 @@ void CGauss::SecondaryAttack()
 		// during the charging process, eat one bit of ammo every once in a while
 		if (UTIL_WeaponTimeBase() >= m_pPlayer->m_flNextAmmoBurn && m_pPlayer->m_flNextAmmoBurn != 1000)
 		{
-			if (ag_unlimited_uranium.value == 0.0f)
+			if (!ag_unlimited_uranium.GetBool())
 				m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
 
 			m_pPlayer->m_flNextAmmoBurn = UTIL_WeaponTimeBase() + 0.1;
@@ -507,7 +507,7 @@ void CGauss::Fire(Vector vecOrigSrc, Vector vecDir, float flDamage)
 
 			//++ BulliT
 			//    pEntity->TraceAttack( m_pPlayer->pev, flDamage, vecDir, &tr, DMG_ENERGYBEAM );
-			if (pEntity == m_pPlayer && 0 < ag_gauss_fix.value)
+			if (pEntity == m_pPlayer && ag_gauss_fix.GetInt())
 			{
 				// Skip reflective gauss on the player that holds the gun. Americans that wanna fiddle around :P
 			}
@@ -564,12 +564,12 @@ void CGauss::Fire(Vector vecOrigSrc, Vector vecDir, float flDamage)
 
 				// try punching through wall if secondary attack (primary is incapable of breaking through)
 				//++ BulliT
-				if (!m_fPrimaryFire && 0 < ag_wallgauss.value)
+				if (!m_fPrimaryFire && ag_wallgauss.GetBool())
 				// if ( !m_fPrimaryFire )
 				//-- Martin Webrant
 				{
 					Vector startPoint;
-					if (ag_nuke_gauss.value != 0.0f)
+					if (ag_nuke_gauss.GetBool())
 						startPoint = tr.vecEndPos + vecDir * 8;
 					else
 						startPoint = tr.vecEndPos + vecDir;
@@ -599,7 +599,7 @@ void CGauss::Fire(Vector vecOrigSrc, Vector vecDir, float flDamage)
 							{
 								//++ BulliT
 								// damage_radius = flDamage * 1.75;  // Old code == 2.5
-								damage_radius = flDamage * 1.75 * ag_wallgauss.value; // Old code == 2.5
+								damage_radius = flDamage * 1.75 * ag_wallgauss.GetBool(); // Old code == 2.5
 								//-- Martin Webrant
 							}
 							else
@@ -608,7 +608,7 @@ void CGauss::Fire(Vector vecOrigSrc, Vector vecDir, float flDamage)
 							}
 
 							Vector damagePoint;
-							if (ag_nuke_gauss.value != 0.0f)
+							if (ag_nuke_gauss.GetBool())
 								damagePoint = beam_tr.vecEndPos + vecDir * 8;
 							else
 							{

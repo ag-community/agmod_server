@@ -108,7 +108,7 @@ void AgDOM::SendControlScores(CBasePlayer *pPlayer)
 
 bool AgDOM::ScoreLimit(void)
 {
-	if (ag_dom_scorelimit.value > 1 && (s_iTeam1Score >= ag_dom_scorelimit.value || s_iTeam2Score >= ag_dom_scorelimit.value))
+	if (ag_dom_scorelimit.GetInt() > 1 && (s_iTeam1Score >= ag_dom_scorelimit.GetInt() || s_iTeam2Score >= ag_dom_scorelimit.GetInt()))
 		return true;
 
 	return false;
@@ -234,7 +234,7 @@ void AgDOMControlPoint::Capture(CBasePlayer *pPlayer, const char *szTeamName)
 
 	ChangeControllingTeam(szTeamName);
 
-	m_fCaptureTime = gpGlobals->time + ag_dom_mincontroltime.value;
+	m_fCaptureTime = gpGlobals->time + ag_dom_mincontroltime.GetInt();
 	m_iConsecutiveScores = 0; // reset score count
 	pCapturingPlayer = pPlayer;
 
@@ -350,14 +350,14 @@ void AgDOMControlPoint::Think(void)
 		{
 			// Team scores
 			if (FStrEq(m_szTeamName, DOM_TEAM1_NAME))
-				s_iTeam1Score += ag_dom_controlpoints.value;
+				s_iTeam1Score += ag_dom_controlpoints.GetInt();
 			else if (FStrEq(m_szTeamName, DOM_TEAM2_NAME))
-				s_iTeam2Score += ag_dom_controlpoints.value;
+				s_iTeam2Score += ag_dom_controlpoints.GetInt();
 
 			// Give the player the points
 			if (pCapturingPlayer && FStrEq(pCapturingPlayer->m_szTeamName, m_szTeamName))
-				pCapturingPlayer->AddPoints(ag_dom_controlpoints.value, true);
-			// pCapturingPlayer->AddPointsToTeam(ag_dom_controlpoints.value, true);  // is this required?
+				pCapturingPlayer->AddPoints(ag_dom_controlpoints.GetInt(), true);
+			// pCapturingPlayer->AddPointsToTeam(ag_dom_controlpoints.GetInt(), true);  // is this required?
 			else if (pCapturingPlayer)
 				pCapturingPlayer = NULL;
 
@@ -365,12 +365,12 @@ void AgDOMControlPoint::Think(void)
 			m_iConsecutiveScores++;
 
 			// reset score timer
-			m_fCaptureTime = gpGlobals->time + ag_dom_mincontroltime.value;
+			m_fCaptureTime = gpGlobals->time + ag_dom_mincontroltime.GetInt();
 		}
 
 	// Have we pased the max capture score limit, if so return control of this flag to
 	// a neutral state.
-	if (m_iConsecutiveScores >= ag_dom_resetscorelimit.value)
+	if (m_iConsecutiveScores >= ag_dom_resetscorelimit.GetInt())
 	{
 		char szText[201];
 		sprintf(szText, "Neutral CP available at %s", m_szLocation);

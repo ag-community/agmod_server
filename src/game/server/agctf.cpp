@@ -67,7 +67,7 @@ AgCTF::AgCTF()
 	m_fNextCountdown = 0.0;
 	m_fMatchStart = 0.0;
 
-	if (ag_ctf_roundbased.value)
+	if (ag_ctf_roundbased.GetBool())
 		m_Status = Waiting;
 	else
 		m_Status = Playing;
@@ -101,7 +101,7 @@ void AgCTF::PlayerInitHud(CBasePlayer *pPlayer)
 
 bool AgCTF::CaptureLimit()
 {
-	if (ag_ctf_capture_limit.value > 1 && (s_iTeam1Captures == ag_ctf_capture_limit.value || s_iTeam2Captures == ag_ctf_capture_limit.value))
+	if (ag_ctf_capture_limit.GetInt() > 1 && (s_iTeam1Captures == ag_ctf_capture_limit.GetInt() || s_iTeam2Captures == ag_ctf_capture_limit.GetInt()))
 		return true;
 
 	return false;
@@ -397,7 +397,7 @@ void AgCTF::AddPointsForKill(CBasePlayer *pAttacker, CBasePlayer *pKilled)
 	if (FStrEq(CTF_TEAM1_NAME, pKilled->m_szTeamName) && pKilled->m_bFlagTeam2 || FStrEq(CTF_TEAM2_NAME, pKilled->m_szTeamName) && pKilled->m_bFlagTeam1)
 	{
 		// He killed the flag carrier.
-		pAttacker->AddPoints(ag_ctf_carrierkillpoints.value, true);
+		pAttacker->AddPoints(ag_ctf_carrierkillpoints.GetInt(), true);
 	}
 
 	// Check if he is 192 units within his own flag (defending)
@@ -413,7 +413,7 @@ void AgCTF::AddPointsForKill(CBasePlayer *pAttacker, CBasePlayer *pKilled)
 		float fDistance = (vtFlag - vtPlayer).Length();
 		if (fDistance < 192)
 			// Add points for defending.
-			pAttacker->AddPoints(ag_ctf_defendpoints.value, true);
+			pAttacker->AddPoints(ag_ctf_defendpoints.GetInt(), true);
 	}
 }
 
@@ -468,7 +468,7 @@ void AgCTF::PlayerDropFlag(CBasePlayer *pPlayer, bool bPlayerDrop)
 			pFlag->m_fNextTouch = gpGlobals->time + 0.5; // Gotta give the flag a bit of time to fly away from player before it can be picked up again.
 		pFlag->m_bDropped = true;
 
-		pFlag->m_fNextReset = gpGlobals->time + ag_ctf_flag_resettime.value;
+		pFlag->m_fNextReset = gpGlobals->time + ag_ctf_flag_resettime.GetInt();
 
 		pPlayer->m_bFlagTeam1 = false;
 		pPlayer->m_bFlagTeam2 = false;
@@ -543,8 +543,8 @@ void AgCTFFlag::Capture(CBasePlayer *pPlayer, const char *m_szTeamName)
 	UTIL_ClientPrintAll(HUD_PRINTCENTER, szText);
 
 	// Give the player the points
-	pPlayer->AddPoints(ag_ctf_capturepoints.value, true);
-	pPlayer->AddPointsToTeam(ag_ctf_teamcapturepoints.value, true);
+	pPlayer->AddPoints(ag_ctf_capturepoints.GetInt(), true);
+	pPlayer->AddPointsToTeam(ag_ctf_teamcapturepoints.GetInt(), true);
 
 	// And give the team a capture
 	if (FStrEq(CTF_TEAM1_NAME, m_szTeamName))
@@ -556,7 +556,7 @@ void AgCTFFlag::Capture(CBasePlayer *pPlayer, const char *m_szTeamName)
 		s_iTeam2Captures++;
 		UTIL_LogPrintf("Team \"%s\" triggered \"Capture\" (%s \"%d\") (%s \"%d\")\n", CTF_TEAM2_NAME, CTF_TEAM1_NAME, s_iTeam1Captures, CTF_TEAM2_NAME, s_iTeam2Captures);
 
-		if (ag_ctf_roundbased.value)
+		if (ag_ctf_roundbased.GetBool())
 			g_pGameRules->m_CTF.RoundOver(CTF_TEAM2_NAME);
 	}
 	else if (FStrEq(CTF_TEAM2_NAME, m_szTeamName))
@@ -568,7 +568,7 @@ void AgCTFFlag::Capture(CBasePlayer *pPlayer, const char *m_szTeamName)
 		s_iTeam1Captures++;
 		UTIL_LogPrintf("Team \"%s\" triggered \"Capture\" (%s \"%d\") (%s \"%d\")\n", CTF_TEAM1_NAME, CTF_TEAM1_NAME, s_iTeam1Captures, CTF_TEAM2_NAME, s_iTeam2Captures);
 
-		if (ag_ctf_roundbased.value)
+		if (ag_ctf_roundbased.GetBool())
 			g_pGameRules->m_CTF.RoundOver(CTF_TEAM1_NAME);
 	}
 
@@ -707,7 +707,7 @@ bool AgCTFFlag::MyTouch(CBasePlayer *pPlayer)
 				UTIL_ClientPrintAll(HUD_PRINTCENTER, szText);
 				UTIL_Remove(this);
 
-				pPlayer->AddPoints(ag_ctf_returnpoints.value, true);
+				pPlayer->AddPoints(ag_ctf_returnpoints.GetInt(), true);
 
 				MESSAGE_BEGIN(MSG_ALL, gmsgCTFSound);
 				WRITE_BYTE(BlueFlagReturned);
@@ -748,7 +748,7 @@ bool AgCTFFlag::MyTouch(CBasePlayer *pPlayer)
 				WRITE_BYTE(RedFlagReturned);
 				MESSAGE_END();
 
-				pPlayer->AddPoints(ag_ctf_returnpoints.value, true);
+				pPlayer->AddPoints(ag_ctf_returnpoints.GetInt(), true);
 			}
 			// but don't pick it up!
 			return false;
@@ -799,13 +799,13 @@ bool AgCTFFlag::MyTouch(CBasePlayer *pPlayer)
 		if (FStrEq(CTF_TEAM1_NAME, m_szTeamName))
 		{
 			if (!g_bTeam1FlagLost)
-				pPlayer->AddPoints(ag_ctf_stealpoints.value, true);
+				pPlayer->AddPoints(ag_ctf_stealpoints.GetInt(), true);
 			sprintf(szText, "%s got the %s flag!\n", STRING(pPlayer->pev->netname), CTF_TEAM1_NAME);
 		}
 		else if (FStrEq(CTF_TEAM2_NAME, m_szTeamName))
 		{
 			if (!g_bTeam2FlagLost)
-				pPlayer->AddPoints(ag_ctf_stealpoints.value, true);
+				pPlayer->AddPoints(ag_ctf_stealpoints.GetInt(), true);
 			sprintf(szText, "%s got the %s flag!\n", STRING(pPlayer->pev->netname), CTF_TEAM2_NAME);
 		}
 
@@ -1120,7 +1120,7 @@ class AgCTFDetect : public CBaseEntity
 		pev->solid = SOLID_NOT;
 		pev->effects = EF_NODRAW;
 
-		if (ag_gamemode_auto.value > 0.0f)
+		if (ag_gamemode_auto.GetBool())
 		{
 			AgString sGametype = CVAR_GET_STRING("sv_ag_gametype");
 			if (sGametype != "ctf")
@@ -1238,7 +1238,7 @@ ReturnSpot:
 	}
 	g_spawnHistory.push_back(pSpot);
 
-	if (g_spawnHistory.size() > ag_spawn_history_entries.value)
+	if (g_spawnHistory.size() > ag_spawn_history_entries.GetInt())
 		g_spawnHistory.erase(g_spawnHistory.begin());
 
 	return pSpot->edict();

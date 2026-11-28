@@ -150,68 +150,68 @@ void CHalfLifeRules ::PlayerSpawn(CBasePlayer *pPlayer)
 
 	if (addDefault)
 	{
-		pPlayer->pev->health = ag_start_health.value;
-		pPlayer->pev->armorvalue = ag_start_armour.value;
+		pPlayer->pev->health = ag_start_health.GetInt();
+		pPlayer->pev->armorvalue = ag_start_armour.GetInt();
 
-		if (0 < ag_start_longjump.value)
+		if (0 < ag_start_longjump.GetInt())
 		{
 			pPlayer->m_fLongJump = true;
 			g_engfuncs.pfnSetPhysicsKeyValue(pPlayer->edict(), "slj", "1");
 			pPlayer->OnPickupLongjump();
 		}
-		if (0 < ag_start_glock.value)
+		if (0 < ag_start_glock.GetInt())
 			pPlayer->GiveNamedItem("weapon_9mmhandgun");
-		if (0 < ag_start_crowbar.value)
+		if (0 < ag_start_crowbar.GetInt())
 			pPlayer->GiveNamedItem("weapon_crowbar");
-		if (0 < ag_start_shotgun.value)
+		if (0 < ag_start_shotgun.GetInt())
 			pPlayer->GiveNamedItem("weapon_shotgun");
-		if (0 < ag_start_mp5.value)
+		if (0 < ag_start_mp5.GetInt())
 			pPlayer->GiveNamedItem("weapon_9mmAR");
-		if (0 < ag_start_gauss.value)
+		if (0 < ag_start_gauss.GetInt())
 			pPlayer->GiveNamedItem("weapon_gauss");
-		if (0 < ag_start_hgrenade.value)
+		if (0 < ag_start_hgrenade.GetInt())
 			pPlayer->GiveNamedItem("weapon_handgrenade");
-		if (0 < ag_start_tripmine.value)
+		if (0 < ag_start_tripmine.GetInt())
 			pPlayer->GiveNamedItem("weapon_tripmine");
-		if (0 < ag_start_egon.value)
+		if (0 < ag_start_egon.GetInt())
 			pPlayer->GiveNamedItem("weapon_egon");
-		if (0 < ag_start_crossbow.value)
+		if (0 < ag_start_crossbow.GetInt())
 			pPlayer->GiveNamedItem("weapon_crossbow");
-		if (0 < ag_start_357.value)
+		if (0 < ag_start_357.GetInt())
 			pPlayer->GiveNamedItem("weapon_357");
-		if (0 < ag_start_rpg.value)
+		if (0 < ag_start_rpg.GetInt())
 			pPlayer->GiveNamedItem("weapon_rpg");
-		if (0 < ag_start_satchel.value)
+		if (0 < ag_start_satchel.GetInt())
 			pPlayer->GiveNamedItem("weapon_satchel");
-		if (0 < ag_start_snark.value)
+		if (0 < ag_start_snark.GetInt())
 			pPlayer->GiveNamedItem("weapon_snark");
-		if (0 < ag_start_hornet.value)
+		if (0 < ag_start_hornet.GetInt())
 			pPlayer->GiveNamedItem("weapon_hornetgun");
 
-		if (0 < ag_start_hgrenade.value)
-			pPlayer->GiveAmmo(ag_start_hgrenade.value, "Hand Grenade", HANDGRENADE_MAX_CARRY);
-		if (0 < ag_start_satchel.value)
-			pPlayer->GiveAmmo(ag_start_satchel.value, "Satchel Charge", SATCHEL_MAX_CARRY);
-		if (0 < ag_start_tripmine.value)
-			pPlayer->GiveAmmo(ag_start_tripmine.value, "Trip Mine", TRIPMINE_MAX_CARRY);
-		if (0 < ag_start_snark.value)
-			pPlayer->GiveAmmo(ag_start_snark.value, "Snarks", SNARK_MAX_CARRY);
-		if (0 < ag_start_hornet.value)
-			pPlayer->GiveAmmo(ag_start_hornet.value, "Hornets", HORNET_MAX_CARRY);
-		if (0 < ag_start_m203.value)
-			pPlayer->GiveAmmo(ag_start_m203.value, "ARgrenades", M203_GRENADE_MAX_CARRY);
-		if (0 < ag_start_uranium.value)
-			pPlayer->GiveAmmo(ag_start_uranium.value, "uranium", URANIUM_MAX_CARRY);
-		if (0 < ag_start_9mmar.value)
-			pPlayer->GiveAmmo(ag_start_9mmar.value, "9mm", _9MM_MAX_CARRY);
-		if (0 < ag_start_357ammo.value)
-			pPlayer->GiveAmmo(ag_start_357ammo.value, "357", _357_MAX_CARRY);
-		if (0 < ag_start_bockshot.value)
-			pPlayer->GiveAmmo(ag_start_bockshot.value, "buckshot", BUCKSHOT_MAX_CARRY);
-		if (0 < ag_start_bolts.value)
-			pPlayer->GiveAmmo(ag_start_bolts.value, "bolts", BOLT_MAX_CARRY);
-		if (0 < ag_start_rockets.value)
-			pPlayer->GiveAmmo(ag_start_rockets.value, "rockets", ROCKET_MAX_CARRY);
+		if (0 < ag_start_hgrenade.GetInt())
+			pPlayer->GiveAmmo(ag_start_hgrenade.GetInt(), "Hand Grenade", HANDGRENADE_MAX_CARRY);
+		if (0 < ag_start_satchel.GetInt())
+			pPlayer->GiveAmmo(ag_start_satchel.GetInt(), "Satchel Charge", SATCHEL_MAX_CARRY);
+		if (0 < ag_start_tripmine.GetInt())
+			pPlayer->GiveAmmo(ag_start_tripmine.GetInt(), "Trip Mine", TRIPMINE_MAX_CARRY);
+		if (0 < ag_start_snark.GetInt())
+			pPlayer->GiveAmmo(ag_start_snark.GetInt(), "Snarks", SNARK_MAX_CARRY);
+		if (0 < ag_start_hornet.GetInt())
+			pPlayer->GiveAmmo(ag_start_hornet.GetInt(), "Hornets", HORNET_MAX_CARRY);
+		if (0 < ag_start_m203.GetInt())
+			pPlayer->GiveAmmo(ag_start_m203.GetInt(), "ARgrenades", M203_GRENADE_MAX_CARRY);
+		if (0 < ag_start_uranium.GetInt())
+			pPlayer->GiveAmmo(ag_start_uranium.GetInt(), "uranium", URANIUM_MAX_CARRY);
+		if (0 < ag_start_9mmar.GetInt())
+			pPlayer->GiveAmmo(ag_start_9mmar.GetInt(), "9mm", _9MM_MAX_CARRY);
+		if (0 < ag_start_357ammo.GetInt())
+			pPlayer->GiveAmmo(ag_start_357ammo.GetInt(), "357", _357_MAX_CARRY);
+		if (0 < ag_start_bockshot.GetInt())
+			pPlayer->GiveAmmo(ag_start_bockshot.GetInt(), "buckshot", BUCKSHOT_MAX_CARRY);
+		if (0 < ag_start_bolts.GetInt())
+			pPlayer->GiveAmmo(ag_start_bolts.GetInt(), "bolts", BOLT_MAX_CARRY);
+		if (0 < ag_start_rockets.GetInt())
+			pPlayer->GiveAmmo(ag_start_rockets.GetInt(), "rockets", ROCKET_MAX_CARRY);
 	}
 }
 

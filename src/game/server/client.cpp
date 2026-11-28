@@ -136,10 +136,10 @@ void ClientDisconnect(edict_t *pEntity)
 // called by ClientKill and DeadThink
 void respawn(entvars_t *pev, bool fCopyCorpse)
 {
-	if ((gpGlobals->coop || gpGlobals->deathmatch) && singleplayer.value == 0.0f)
+	if ((gpGlobals->coop || gpGlobals->deathmatch) && singleplayer.GetFloat() == 0.0f)
 	{
 		//++ BulliT
-		if (fCopyCorpse && pev->movetype != MOVETYPE_NOCLIP && 0 < ag_show_gibs.value)
+		if (fCopyCorpse && pev->movetype != MOVETYPE_NOCLIP && ag_show_gibs.GetBool())
 		//		if ( fCopyCorpse )
 		//-- Martin Webrant
 		{
@@ -172,7 +172,7 @@ void ClientKill(edict_t *pEntity)
 	CBasePlayer *pl = (CBasePlayer *)CBasePlayer::Instance(pev);
 
 	//++ BulliT
-	if (pl->m_fNextSuicideTime > gpGlobals->time && !pl->IsSpectator() || ARENA == AgGametype() || ag_match_running.value > 0)
+	if (pl->m_fNextSuicideTime > gpGlobals->time && !pl->IsSpectator() || ARENA == AgGametype() || ag_match_running.GetBool())
 		// if ( pl->m_fNextSuicideTime > gpGlobals->time )
 		//-- Martin Webrant
 		return; // prevent suiciding too ofter
@@ -444,7 +444,7 @@ void Host_Say(edict_t *pEntity, int teamonly)
 				continue;
 
 		// sv_ag_match_mute 2 -> match players can't see any non-teammate message
-		if (ag_match_running.value != 0.0f && ag_match_mute.value == 2.0f && !client->IsTeammate(player) && !client->IsSpectator())
+		if (ag_match_running.GetBool() && ag_match_mute.GetInt() == 2 && !client->IsTeammate(player) && !client->IsSpectator())
 			continue;
 
 		MESSAGE_BEGIN(MSG_ONE, gmsgSayText, NULL, client->pev);
@@ -689,7 +689,7 @@ void ServerActivate(edict_t *pEdictList, int edictCount, int clientMax)
 	// Every call to ServerActivate should be matched by a call to ServerDeactivate
 	g_serveractive = 1;
 
-	if (singleplayer.value != 0.0f)
+	if (singleplayer.GetFloat() != 0.0f)
 	{
 		if (g_isRestoring)
 		{
@@ -785,7 +785,7 @@ void StartFrame(void)
 	if (g_fGameOver)
 		return;
 
-	gpGlobals->teamplay = teamplay.value;
+	gpGlobals->teamplay = teamplay.GetBool();
 	g_ulFrameCount++;
 }
 
@@ -951,7 +951,7 @@ void PlayerCustomization(edict_t *pEntity, customization_t *pCust)
 	entvars_t *pev = &pEntity->v;
 	CBasePlayer *pPlayer = (CBasePlayer *)GET_PRIVATE(pEntity);
 
-	if (singleplayer.value > 0.0f)
+	if (singleplayer.GetFloat() > 0.0f)
 	{
 		// HACK: This is called on map start, on saveload and changelevel, when the load frames
 		// are about to finish, so it's a good place to fix mouse input, just keep trying

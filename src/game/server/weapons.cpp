@@ -598,7 +598,7 @@ void CBasePlayerItem::DefaultTouch(CBaseEntity *pOther)
 		AttachToPlayer(pPlayer);
 
 		if (pPlayer->m_bInSpawn)
-			EMIT_SOUND(ENT(pPlayer->pev), CHAN_ITEM, "items/gunpickup2.wav", ag_spawn_volume.value, ATTN_NORM);
+			EMIT_SOUND(ENT(pPlayer->pev), CHAN_ITEM, "items/gunpickup2.wav", ag_spawn_volume.GetFloat(), ATTN_NORM);
 		else
 			EMIT_SOUND(ENT(pPlayer->pev), CHAN_ITEM, "items/gunpickup2.wav", 1, ATTN_NORM);
 	}

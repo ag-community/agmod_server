@@ -94,7 +94,7 @@ void AgScoreCache::UpdateScore(CBasePlayer *pPlayer)
 	if (!pPlayer->pev)
 		return;
 
-	if (1 > ag_match_running.value)
+	if (!ag_match_running.GetBool())
 		return;
 
 	if (pPlayer->IsProxy() || pPlayer->pev->flags & FL_FAKECLIENT)

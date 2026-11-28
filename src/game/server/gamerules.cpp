@@ -316,7 +316,7 @@ AgGameRules *InstallGameRules(void)
 {
 	CVar::StopRecordingStartupChanges();
 
-	if (singleplayer.value > 0.0f)
+	if (singleplayer.GetFloat() > 0.0f)
 	{
 		SERVER_COMMAND("exec game.cfg\n");
 		SERVER_EXECUTE_HL();
@@ -339,7 +339,7 @@ AgGameRules *InstallGameRules(void)
 
 	CVar::StopRecordingServerChanges();
 
-	if (ag_gamemode_auto.value > 0.0f)
+	if (ag_gamemode_auto.GetBool())
 	{
 		// Detect CTF maps.
 		if (AgIsCTFMap(STRING(gpGlobals->mapname)))
@@ -370,7 +370,7 @@ AgGameRules *InstallGameRules(void)
 
 	ReseedSpawnSystem();
 
-	if (teamplay.value > 0)
+	if (teamplay.GetBool())
 	{
 		// teamplay
 

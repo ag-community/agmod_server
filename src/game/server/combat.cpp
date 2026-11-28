@@ -1009,7 +1009,7 @@ void RadiusDamage(Vector vecSrc, entvars_t *pevInflictor, entvars_t *pevAttacker
 	Vector vecSpot;
 
 	//++ BulliT
-	flRadius *= ag_blastradius.value;
+	flRadius *= ag_blastradius.GetFloat();
 	//-- Martin Webrant
 	if (flRadius)
 		falloff = flDamage / flRadius;
@@ -1044,7 +1044,7 @@ void RadiusDamage(Vector vecSrc, entvars_t *pevInflictor, entvars_t *pevAttacker
 
 			UTIL_TraceLine(vecSrc, vecSpot, dont_ignore_monsters, ENT(pevInflictor), &tr);
 
-			if (tr.flFraction != 1.0 && tr.pHit != pEntity->edict() && directHit && tr.pHit == directHit->edict() && ag_explosion_fix.value != 0.0f)
+			if (tr.flFraction != 1.0 && tr.pHit != pEntity->edict() && directHit && tr.pHit == directHit->edict() && ag_explosion_fix.GetBool())
 			{
 				// Sometimes when it's a direct hit, the radius damage is located somewhere around the player model
 				// that may lead to not being able to trace a straight line to other entities around it, for example
@@ -1083,13 +1083,13 @@ void RadiusDamage(Vector vecSrc, entvars_t *pevInflictor, entvars_t *pevAttacker
 						if (!isValidHit && !IsNukeAllowed(pevInflictor))
 							continue;
 
-						if (ag_gauss_fix.value >= 2.0f && FClassnameIs(pevInflictor, "weapon_gauss") && pEntity == CBaseEntity::Instance(pevAttacker))
+						if (ag_gauss_fix.GetInt() >= 2 && FClassnameIs(pevInflictor, "weapon_gauss") && pEntity == CBaseEntity::Instance(pevAttacker))
 						{
 							continue;
 						}
 					}
 
-					if (!(isValidHit && ag_explosion_fix.value != 0.0f))
+					if (!(isValidHit && ag_explosion_fix.GetBool()))
 					{
 						// if we're stuck inside them, fixup the position and distance
 						tr.vecEndPos = vecSrc;
@@ -1097,7 +1097,7 @@ void RadiusDamage(Vector vecSrc, entvars_t *pevInflictor, entvars_t *pevAttacker
 					}
 				}
 
-				if (ag_explosion_fix.value != 0.0f && directHit == pEntity)
+				if (ag_explosion_fix.GetBool() && directHit == pEntity)
 				{
 					// Radius damage that is a direct hit should deal full damage instead of a ~99.5%
 					flFalloffReducedDamage = -0.01f;

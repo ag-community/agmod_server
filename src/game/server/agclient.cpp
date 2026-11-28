@@ -21,7 +21,7 @@ extern CVoiceGameMgr g_VoiceGameMgr;
 #include "agmsgstat.h"
 #endif
 
-extern cvar_t timeleft, fragsleft;
+extern AgConVar timeleft, fragsleft;
 extern int gmsgSayText;
 extern int gmsgLocation;
 extern int gmsgAuthID;
@@ -169,8 +169,8 @@ bool AgClient::HandleCommand(CBasePlayer *pPlayer)
 	}
 	else if (FStrEq(CMD_ARGV(0), "timeleft"))
 	{
-		if (timelimit.value && timeleft.value)
-			AgConsole(UTIL_VarArgs("timeleft = %.0f", timeleft.value), pPlayer);
+		if (timelimit.GetFloat() && timeleft.GetFloat())
+			AgConsole(UTIL_VarArgs("timeleft = %.0f", timeleft.GetFloat()), pPlayer);
 		return true;
 	}
 	else if (FStrEq(CMD_ARGV(0), "timeout"))
@@ -323,7 +323,7 @@ bool AgClient::HandleCommand(CBasePlayer *pPlayer)
 	}
 	else if (FStrEq(CMD_ARGV(0), "stats_run"))
 	{
-		if (singleplayer.value > 0.0f && g_bLangame)
+		if (singleplayer.GetFloat() > 0.0f && g_bLangame)
 		{
 			SpeedrunStats::PrintRun();
 			return true;
@@ -332,7 +332,7 @@ bool AgClient::HandleCommand(CBasePlayer *pPlayer)
 	}
 	else if (FStrEq(CMD_ARGV(0), "stats_session"))
 	{
-		if (singleplayer.value > 0.0f && g_bLangame)
+		if (singleplayer.GetFloat() > 0.0f && g_bLangame)
 		{
 			SpeedrunStats::PrintSession();
 			return true;
@@ -341,7 +341,7 @@ bool AgClient::HandleCommand(CBasePlayer *pPlayer)
 	}
 	else if (FStrEq(CMD_ARGV(0), "delay_changelevel"))
 	{
-		if (singleplayer.value > 0.0f && g_bLangame)
+		if (singleplayer.GetFloat() > 0.0f && g_bLangame)
 		{
 			if (g_bPostponeChangelevel && g_pLastChangelevel)
 				g_pLastChangelevel->DoChangeLevel();
@@ -349,7 +349,7 @@ bool AgClient::HandleCommand(CBasePlayer *pPlayer)
 			g_bPostponeChangelevel = !g_bPostponeChangelevel;
 
 			const auto msg = UTIL_VarArgs("Changelevel delay: %s\n", g_bPostponeChangelevel ? "ON" : "OFF");
-			if (ag_say_on_changelevel_delay.value != 0.0f)
+			if (ag_say_on_changelevel_delay.GetFloat() != 0.0f)
 				UTIL_ServerMessage(msg);
 			else
 			{
@@ -703,11 +703,11 @@ void AgClient::Say(CBasePlayer *pPlayer, say_type Type)
 					continue;
 
 				// Dont let specs talk to all if spectalk = 0 if it aint an admin on a match
-				if (0 == ag_spectalk.value && !pPlayer->IsAdmin() && All == Type && 0 < ag_match_running.value && pPlayer != pPlayerLoop)
+				if (!ag_spectalk.GetBool() && !pPlayer->IsAdmin() && All == Type && ag_match_running.GetBool() && pPlayer != pPlayerLoop)
 					continue;
 
 				// sv_ag_match_mute 2, i'm a spec and match players won't see my message
-				if (ag_match_running.value != 0.0f && ag_match_mute.value == 2.0f && !pPlayer->IsAdmin() && !pPlayerLoop->IsSpectator() && pPlayer != pPlayerLoop)
+				if (ag_match_running.GetBool() && ag_match_mute.GetInt() == 2 && !pPlayer->IsAdmin() && !pPlayerLoop->IsSpectator() && pPlayer != pPlayerLoop)
 					continue;
 
 				if (bSendLocation)
@@ -767,7 +767,7 @@ void AgClient::Say(CBasePlayer *pPlayer, say_type Type)
 
 				// sv_ag_match_mute 2, i'm a match player and my opponents won't see my messages,
 				// but my teammates and specs will see them
-				if (ag_match_running.value != 0.0f && ag_match_mute.value == 2.0f && !pPlayer->IsTeammate(pPlayerLoop) && !pPlayerLoop->IsSpectator())
+				if (ag_match_running.GetBool() && ag_match_mute.GetInt() == 2 && !pPlayer->IsTeammate(pPlayerLoop) && !pPlayerLoop->IsSpectator())
 					continue;
 
 				if (bSendLocation)

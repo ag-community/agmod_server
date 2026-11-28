@@ -1439,7 +1439,7 @@ void CChangeLevel ::ChangeLevel(CBaseEntity *pActivator)
 
 	//	ALERT( at_console, "Level touches %d levels\n", ChangeList( levels, 16 ) );
 	const auto msg = UTIL_VarArgs("CHANGE LEVEL: %s %s\n", st_szNextMap, st_szNextSpot);
-	if (g_bPostponeChangelevel && ag_say_on_changelevel_delay.value != 0.0f)
+	if (g_bPostponeChangelevel && ag_say_on_changelevel_delay.GetFloat() != 0.0f)
 	{
 		if (g_pLastChangelevel != this)
 			UTIL_ServerMessage(msg);

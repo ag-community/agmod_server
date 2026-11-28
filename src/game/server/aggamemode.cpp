@@ -180,13 +180,13 @@ void AgGameMode::Think()
 		m_fNextCheck = gpGlobals->time + 1; // Check every second.
 	}
 
-	if (m_fNextFpsLimitCheck <= gpGlobals->time && ag_fps_limit_auto.value > 0.0f)
+	if (m_fNextFpsLimitCheck <= gpGlobals->time && ag_fps_limit_auto.GetBool())
 	{
 		// Automatic fps limiter. We gather players' fps_max and limit, classify them into
 		// a set of predefined standard-ish fps_max values and take the mode number as the limit
 		std::map<float, int> classifiedFpsMaxValues;
 
-		const auto isSteampipe = ag_fps_limit_steampipe.value > 0;
+		const auto isSteampipe = ag_fps_limit_steampipe.GetBool();
 
 		// Initialize the classification
 		for (const auto standardValue : STANDARD_FPS_VALUES)
@@ -223,10 +223,10 @@ void AgGameMode::Think()
 			classifiedFpsMaxValues[closestValue]++;
 		}
 
-		if (ag_fps_limit_check_interval.value < MIN_FPS_LIMIT_CHECK_INTERVAL)
+		if (ag_fps_limit_check_interval.GetFloat() < MIN_FPS_LIMIT_CHECK_INTERVAL)
 			CVAR_SET_FLOAT("ag_fps_limit_check_interval", MIN_FPS_LIMIT_CHECK_INTERVAL);
 
-		m_fNextFpsLimitCheck = gpGlobals->time + ag_fps_limit_check_interval.value;
+		m_fNextFpsLimitCheck = gpGlobals->time + ag_fps_limit_check_interval.GetFloat();
 
 		if (players == 0)
 			return;
@@ -238,7 +238,7 @@ void AgGameMode::Think()
 
 		auto newFpsLimit = modeFps->first;
 
-		if (ag_fps_limit.value == newFpsLimit)
+		if (ag_fps_limit.GetInt() == newFpsLimit)
 			return;
 
 		CVAR_SET_FLOAT("ag_fps_limit", newFpsLimit);
@@ -348,7 +348,7 @@ void AgGameMode::ExecConfig()
 		// Setup the gametype.
 		SetupGametype();
 
-		if (ag_log_cvars.value == 2.0f)
+		if (ag_log_cvars.GetInt() == 2)
 		{
 			AgString msg;
 			const auto cvars = CVar::GetGamemodeCVars();
@@ -361,7 +361,7 @@ void AgGameMode::ExecConfig()
 			AgConsole(msg);
 		}
 
-		if (ag_log_cvars.value >= 1.0f)
+		if (ag_log_cvars.GetInt() >= 1)
 		{
 			const auto changedCVars = CVar::GetChangesOverGamemode();
 			if (changedCVars.size() > 0)

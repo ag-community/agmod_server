@@ -84,7 +84,7 @@ void CSatchelCharge ::Spawn(void)
 
 	pev->friction = 0.8;
 
-	if (ag_satchel_solid.value == 0.0f)
+	if (!ag_satchel_solid.GetBool())
 	{
 		pev->solid = SOLID_TRIGGER;
 		// When you throw a satchel with SOLID_TRIGGER, it flies lower than with SOLID_BBOX,
@@ -101,7 +101,7 @@ void CSatchelCharge ::Spawn(void)
 	// ResetSequenceInfo( );
 	pev->sequence = 1;
 
-	if (ag_satchel_destroyable.value > 0.0f)
+	if (ag_satchel_destroyable.GetBool())
 	{
 		// TODO: this is only set on spawn, so if there are satchel charges on the map and the cvar is changed, it won't affect them
 		pev->takedamage = DAMAGE_YES;
@@ -111,14 +111,14 @@ void CSatchelCharge ::Spawn(void)
 		// I have looked at the code for snarks for a reference of something that you can actually shoot at
 		// and kill, but I haven't spotted any special difference with satchels regarding this topic
 
-		if (ag_satchel_health.value <= 1.0f)
+		if (ag_satchel_health.GetInt() <= 1)
 		{
 			// Minimum 1 hp, because i'm not sure if stuff gets broken on 0 hp or less
 			// and how the rounding works on health, or if it gets rounded at all for non-player entities
 			CVAR_SET_FLOAT("sv_ag_satchel_health", 1.0f);
 		}
 
-		pev->health = ag_satchel_health.value;
+		pev->health = ag_satchel_health.GetInt();
 		pev->max_health = pev->health;
 	}
 }
@@ -129,7 +129,7 @@ void CSatchelCharge::SatchelSlide(CBaseEntity *pOther)
 
 	if (pOther->entindex() > 0)
 	{
-		if (pOther->edict() == pev->owner || ag_satchel_solid.value == 0.0f)
+		if (pOther->edict() == pev->owner || !ag_satchel_solid.GetBool())
 			return;
 	}
 
@@ -271,7 +271,7 @@ int CSatchel::AddDuplicate(CBasePlayerItem *pOriginal)
 	{
 		pSatchel = (CSatchel *)pOriginal;
 
-		if (ag_hl25_satchel_controls.value == 1)
+		if (ag_hl25_satchel_controls.GetBool())
 		{
 			if (pOriginal->m_pPlayer == NULL)
 				return true;
@@ -443,7 +443,7 @@ void CSatchel::Holster(int skiplocal /* = 0 */)
 
 void CSatchel::PrimaryAttack()
 {
-	if (ag_hl25_satchel_controls.value == 1)
+	if (ag_hl25_satchel_controls.GetBool())
 	{
 		// we're reloading, don't allow fire
 		if (m_chargeReady != 2)
@@ -477,7 +477,7 @@ void CSatchel::PrimaryAttack()
 
 void CSatchel::SecondaryAttack(void)
 {
-	if (ag_hl25_satchel_controls.value == 1)
+	if (ag_hl25_satchel_controls.GetBool())
 	{
 		if (m_chargeReady == 1)
 		{

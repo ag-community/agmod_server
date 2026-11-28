@@ -677,7 +677,7 @@ void AgCommand::MaxTime()
 	if (!g_pGameRules)
 		return;
 
-	auto maxLimit = ag_vote_mp_timelimit_high.value;
+	auto maxLimit = ag_vote_mp_timelimit_high.GetInt();
 
 	if (CVAR_GET_FLOAT("mp_timelimit") >= maxLimit)
 	{
@@ -703,7 +703,7 @@ void AgCommand::MoreTime()
 		return;
 	}
 
-	CVAR_SET_FLOAT("mp_timelimit", timelimit + ag_vote_extra_timelimit.value);
+	CVAR_SET_FLOAT("mp_timelimit", timelimit + ag_vote_extra_timelimit.GetInt());
 }
 
 void AgCommand::AddRespawningStaticBot(CBasePlayer *pPlayer)

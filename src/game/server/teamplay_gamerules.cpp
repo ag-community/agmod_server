@@ -50,7 +50,7 @@ CHalfLifeTeamplay ::CHalfLifeTeamplay()
 	m_szTeamList[0] = 0;
 
 	// Cache this because the team code doesn't want to deal with changing this in the middle of a game
-	strncpy(m_szTeamList, teamlist.string, TEAMPLAY_TEAMLISTLENGTH);
+	strncpy(m_szTeamList, teamlist.GetString(), TEAMPLAY_TEAMLISTLENGTH);
 
 	edict_t *pWorld = INDEXENT(0);
 	if (pWorld && pWorld->v.team)
@@ -61,7 +61,7 @@ CHalfLifeTeamplay ::CHalfLifeTeamplay()
 			sprintf(m_szTeamList, "%s;%s", CTF_TEAM1_NAME, CTF_TEAM2_NAME);
 		}
 		//-- Martin Webrant
-		else if (teamoverride.value)
+		else if (teamoverride.GetBool())
 		{
 			const char *pTeamList = STRING(pWorld->v.team);
 			if (pTeamList && strlen(pTeamList))
@@ -79,7 +79,7 @@ CHalfLifeTeamplay ::CHalfLifeTeamplay()
 	RecountTeams();
 }
 
-extern cvar_t timeleft, fragsleft;
+extern AgConVar timeleft, fragsleft;
 
 #include "voice_gamemgr.h"
 extern CVoiceGameMgr g_VoiceGameMgr;
@@ -150,7 +150,7 @@ void CHalfLifeTeamplay ::Think(void)
 	//-- muphicks
 	//-- Martin Webrant
 
-	float flFragLimit = fraglimit.value;
+	float flFragLimit = fraglimit.GetFloat();
 	if (flFragLimit)
 	{
 		int bestfrags = 9999;
@@ -177,13 +177,13 @@ void CHalfLifeTeamplay ::Think(void)
 	// Updates when frags change
 	if (frags_remaining != last_frags)
 	{
-		g_engfuncs.pfnCvar_DirectSet(&fragsleft, UTIL_VarArgs("%i", frags_remaining));
+		g_engfuncs.pfnCvar_DirectSet(fragsleft.GetCvar(), UTIL_VarArgs("%i", frags_remaining));
 	}
 
 	// Updates once per second
-	if (timeleft.value != last_time)
+	if (timeleft.GetFloat() != last_time)
 	{
-		g_engfuncs.pfnCvar_DirectSet(&timeleft, UTIL_VarArgs("%i", time_remaining));
+		g_engfuncs.pfnCvar_DirectSet(timeleft.GetCvar(), UTIL_VarArgs("%i", time_remaining));
 	}
 
 	last_frags = frags_remaining;
@@ -265,11 +265,11 @@ const char *CHalfLifeTeamplay::SetDefaultPlayerTeam(CBasePlayer *pPlayer)
 	RecountTeams();
 
 	// update the current player of the team he is joining
-	if (pPlayer->m_szTeamName[0] == '\0' || !IsValidTeam(pPlayer->m_szTeamName) || defaultteam.value)
+	if (pPlayer->m_szTeamName[0] == '\0' || !IsValidTeam(pPlayer->m_szTeamName) || defaultteam.GetBool())
 	{
 		const char *pTeamName = NULL;
 
-		if (defaultteam.value)
+		if (defaultteam.GetBool())
 		{
 			pTeamName = team_names[0];
 		}
@@ -370,12 +370,12 @@ void CHalfLifeTeamplay::ChangePlayerTeam(CBasePlayer *pPlayer, const char *pTeam
 		m_DisableDeathMessages = true;
 		m_DisableDeathPenalty = true;
 
-		if (ag_match_running.value != 0.0f && ag_match_teamchange_suicide_penalty.value >= 1.0f)
+		if (ag_match_running.GetBool() && ag_match_teamchange_suicide_penalty.GetInt() >= 1)
 		{
 			m_DisableDeathPenalty = false;
 
 			// -1 because a PlayerKilled() will already be triggered due to m_DisableDeathPenalty being false
-			const auto extraSuicides = static_cast<int>(ag_match_teamchange_suicide_penalty.value) - 1;
+			const auto extraSuicides = ag_match_teamchange_suicide_penalty.GetInt() - 1;
 
 			pPlayer->m_iDeaths += extraSuicides;
 			pPlayer->pev->frags -= extraSuicides;
@@ -442,7 +442,7 @@ void CHalfLifeTeamplay::ClientUserInfoChanged(CBasePlayer *pPlayer, char *infobu
 
 	int clientIndex = pPlayer->entindex();
 
-	if (defaultteam.value)
+	if (defaultteam.GetBool())
 	{
 		g_engfuncs.pfnSetClientKeyValue(clientIndex, g_engfuncs.pfnGetInfoKeyBuffer(pPlayer->edict()), "model", pPlayer->m_szTeamName);
 		g_engfuncs.pfnSetClientKeyValue(clientIndex, g_engfuncs.pfnGetInfoKeyBuffer(pPlayer->edict()), "team", pPlayer->m_szTeamName);
@@ -454,7 +454,7 @@ void CHalfLifeTeamplay::ClientUserInfoChanged(CBasePlayer *pPlayer, char *infobu
 		return;
 	}
 
-	if (defaultteam.value || !IsValidTeam(mdls))
+	if (defaultteam.GetBool() || !IsValidTeam(mdls))
 	{
 		g_engfuncs.pfnSetClientKeyValue(clientIndex, g_engfuncs.pfnGetInfoKeyBuffer(pPlayer->edict()), "model", pPlayer->m_szTeamName);
 		if (!pPlayer->IsBot())
@@ -574,7 +574,7 @@ bool CHalfLifeTeamplay::FPlayerCanTakeDamage(CBasePlayer *pPlayer, CBaseEntity *
 	if (pAttacker && pPlayer->IsTeammate(pAttacker))
 	{
 		// my teammate hit me.
-		if ((friendlyfire.value == 0) && (pAttacker != pPlayer))
+		if ((friendlyfire.GetBool()) && (pAttacker != pPlayer))
 		{
 			// friendly fire is off, and this hit came from someone other than myself,  then don't get hurt
 			return false;

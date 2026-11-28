@@ -40,7 +40,7 @@ void AgTimer::Think()
 	if (m_fNextTimerUpdate <= m_fEffectiveTime)
 	{
 		// Sanity time check. Some dudes tends to put timelimit weird.
-		if (timelimit.value > 2880)
+		if (timelimit.GetFloat() > 2880)
 			CVAR_SET_FLOAT("mp_timelimit", 2880); // Max two days.
 
 		// Write the time. (negative turns off timer on client)

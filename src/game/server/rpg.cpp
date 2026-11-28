@@ -465,7 +465,7 @@ void CRpg::PrimaryAttack()
 		UTIL_MakeVectors(m_pPlayer->pev->v_angle); // RpgRocket::Create stomps on globals, so remake.
 
 		//++ BulliT
-		if (ag_rpg_fix.value > 0)
+		if (ag_rpg_fix.GetBool())
 		{
 			// Fixes the RPG wall bug just a little bit - I dont want to remove it all. (You jump back and get the RPG in back of your head)
 			if ((pRocket->pev->velocity.x >= 0 && m_pPlayer->pev->velocity.x < 0) || (pRocket->pev->velocity.x < 0 && m_pPlayer->pev->velocity.x > 0))

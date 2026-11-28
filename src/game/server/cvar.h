@@ -1,6 +1,11 @@
+#ifndef AG_CVAR_H
+#define AG_CVAR_H
+
 #include <map>
 #include <string>
 #include <vector>
+
+#include "convar.h"
 
 // CVar is potentially votable, if the corresponding CVars are enabled (sv_ag_allow_vote,
 // sv_ag_vote_setting, etc.)
@@ -22,7 +27,8 @@ struct ChangedCVar
 	std::string changedValue;
 };
 
-cvar_t Create(char *name, char *value, int flags = 0, int customFlags = 0);
+void Track(const char *name, const char *value, int flags = 0, int customFlags = 0);
+void TrackOnly(const char *name, const char *value, int flags = 0, int customFlags = 0);
 void Load();
 
 bool IsTracked(std::string cvarName);
@@ -42,3 +48,19 @@ void RestoreAllToGamemodeValue();
 void IgnoreLogging();
 void RestoreLogging();
 };
+
+class AgConVar : public ConVar
+{
+public:
+	AgConVar(const char *name, const char *def, int flags = 0, int customFlags = 0, const char *desc = "");
+
+	bool IsVotable() const;
+	bool IsBasicSetting() const;
+	bool IsGamemode() const;
+	int GetCustomFlags() const;
+
+private:
+	int m_CustomFlags;
+};
+
+#endif

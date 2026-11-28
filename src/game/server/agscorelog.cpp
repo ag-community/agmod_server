@@ -25,11 +25,11 @@ AgScoreLog::~AgScoreLog()
 
 void AgScoreLog::Think()
 {
-	if (0 < ag_match_running.value && m_fNextLogUpdate < gpGlobals->time && g_pGameRules)
+	if (ag_match_running.GetBool() && m_fNextLogUpdate < gpGlobals->time && g_pGameRules)
 	{
-		if (0 < timelimit.value)
+		if (0 < timelimit.GetFloat())
 		{
-			long lTime = (long)timelimit.value * 60 - (long)g_pGameRules->m_Timer.GetEffectiveTime();
+			long lTime = (long)timelimit.GetFloat() * 60 - (long)g_pGameRules->m_Timer.GetEffectiveTime();
 			ldiv_t d = ldiv(lTime, 60L);
 			UTIL_LogPrintf("World triggered \"Time left\" (Minutes \"%ld\") (Seconds \"%02ld\")\n", d.quot, d.rem);
 		}
@@ -42,7 +42,7 @@ void AgScoreLog::Think()
 
 void AgScoreLog::Start()
 {
-	if (0 < ag_match_running.value)
+	if (ag_match_running.GetBool())
 	{
 		UTIL_LogPrintf("World triggered \"Match started\"\n");
 	}
@@ -50,7 +50,7 @@ void AgScoreLog::Start()
 
 void AgScoreLog::End()
 {
-	if (0 < ag_match_running.value)
+	if (ag_match_running.GetBool())
 	{
 		UTIL_LogPrintf("World triggered \"Match over\"\n");
 		EndScore();

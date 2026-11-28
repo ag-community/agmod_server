@@ -59,7 +59,7 @@ void CGrenade::Explode(TraceResult *pTrace, int bitsDamageType)
 	// Pull out of the wall a bit
 	if (pTrace->flFraction != 1.0)
 	{
-		if (ag_explosion_fix.value != 0.0f)
+		if (ag_explosion_fix.GetBool())
 		{
 			if (!pTrace->fStartSolid)
 				pev->origin = pTrace->vecEndPos + (pTrace->vecPlaneNormal * pTrace->flFraction);
@@ -186,7 +186,7 @@ void CGrenade::Detonate(void)
 	TraceResult tr;
 	Vector vecSpot; // trace starts here!
 
-	if (ag_explosion_fix.value == 0.0f)
+	if (!ag_explosion_fix.GetBool())
 	{
 		vecSpot = pev->origin + Vector(0, 0, 8);
 		UTIL_TraceLine(vecSpot, vecSpot + Vector(0, 0, -40), ignore_monsters, ENT(pev), &tr);
@@ -215,7 +215,7 @@ void CGrenade::ExplodeTouch(CBaseEntity *pOther)
 
 	pev->enemy = pOther->edict();
 
-	if (ag_explosion_fix.value == 0.0f)
+	if (!ag_explosion_fix.GetBool())
 	{
 		vecSpot = pev->origin - pev->velocity.Normalized() * 32;
 		UTIL_TraceLine(vecSpot, vecSpot + pev->velocity.Normalized() * 64, ignore_monsters, ENT(pev), &tr);

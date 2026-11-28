@@ -136,7 +136,7 @@ void CHandGrenade::WeaponIdle(void)
 			angThrow.x = -10 + angThrow.x * ((90 + 10) / 90.0);
 
 		float flVel;
-		if (ag_hl25_handgrenade_throw.value == 1)
+		if (ag_hl25_handgrenade_throw.GetBool())
 		{
 			static float flMultiplier = 6.5f;
 			flVel = (90 - angThrow.x) * flMultiplier;

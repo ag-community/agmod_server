@@ -70,7 +70,7 @@ void CMP5::Spawn()
 	m_iDefaultAmmo = MP5_DEFAULT_GIVE;
 	//++ BulliT
 #ifndef CLIENT_DLL
-	if (ARENA == AgGametype() || ARCADE == AgGametype() || LMS == AgGametype() || ag_hl25_mp5_max_initial_ammo.value == 1)
+	if (ARENA == AgGametype() || ARCADE == AgGametype() || LMS == AgGametype() || ag_hl25_mp5_max_initial_ammo.GetBool())
 		m_iDefaultAmmo = MP5_MAX_CLIP;
 #endif
 	//-- Martin Webrant
@@ -175,7 +175,7 @@ void CMP5::PrimaryAttack()
 	Vector vecAiming = m_pPlayer->GetAutoaimVector(AUTOAIM_5DEGREES);
 	Vector vecDir;
 
-	if (ag_hl25_mp5_spread.value == 1.0f)
+	if (ag_hl25_mp5_spread.GetBool())
 		vecDir = m_pPlayer->FireBulletsPlayer(1, vecSrc, vecAiming, VECTOR_CONE_6DEGREES, 8192, BULLET_PLAYER_MP5, 2, 0, m_pPlayer->pev, m_pPlayer->random_seed);
 	else
 		vecDir = m_pPlayer->FireBulletsPlayer(1, vecSrc, vecAiming, VECTOR_CONE_3DEGREES, 8192, BULLET_PLAYER_MP5, 2, 0, m_pPlayer->pev, m_pPlayer->random_seed);

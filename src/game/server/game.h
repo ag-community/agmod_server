@@ -16,28 +16,30 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include "cvar.h"
+
 extern void GameDLLInit(void);
 
-extern cvar_t displaysoundlist;
+extern AgConVar displaysoundlist;
 
 // multiplayer server rules
-extern cvar_t teamplay;
-extern cvar_t fraglimit;
-extern cvar_t timelimit;
-extern cvar_t friendlyfire;
-extern cvar_t falldamage;
-extern cvar_t weaponstay;
-extern cvar_t forcerespawn;
-extern cvar_t flashlight;
-extern cvar_t aimcrosshair;
-extern cvar_t decalfrequency;
-extern cvar_t teamlist;
-extern cvar_t teamoverride;
-extern cvar_t defaultteam;
-extern cvar_t allowmonsters;
-extern cvar_t mp_chattime;
+extern AgConVar teamplay;
+extern AgConVar fraglimit;
+extern AgConVar timelimit;
+extern AgConVar friendlyfire;
+extern AgConVar falldamage;
+extern AgConVar weaponstay;
+extern AgConVar forcerespawn;
+extern AgConVar flashlight;
+extern AgConVar aimcrosshair;
+extern AgConVar decalfrequency;
+extern AgConVar teamlist;
+extern AgConVar teamoverride;
+extern AgConVar defaultteam;
+extern AgConVar allowmonsters;
+extern AgConVar mp_chattime;
 
-extern cvar_t singleplayer;
+extern AgConVar singleplayer;
 extern cvar_t sploading;
 extern cvar_t spgausscharging;
 

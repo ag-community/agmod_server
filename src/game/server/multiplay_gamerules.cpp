@@ -193,11 +193,11 @@ void CHalfLifeMultiplay::RefreshSkillData(void)
 constexpr float MIN_INTERMISSION_TIME = 1.0;
 constexpr float MAX_INTERMISSION_TIME = 120.0;
 
-extern cvar_t mp_chattime;
-extern cvar_t mp_intermission_time;
-extern cvar_t mp_intermission_skip_auto;
+extern AgConVar mp_chattime;
+extern AgConVar mp_intermission_time;
+extern AgConVar mp_intermission_skip_auto;
 
-extern cvar_t timeleft, fragsleft;
+extern AgConVar timeleft, fragsleft;
 
 //=========================================================
 //=========================================================
@@ -236,22 +236,22 @@ void CHalfLifeMultiplay ::Think(void)
 			playerCount++;
 		}
 
-		if (mp_intermission_skip_auto.value >= 2.0f && playerCount <= 1)
+		if (mp_intermission_skip_auto.GetInt() >= 2 && playerCount <= 1)
 			m_flIntermissionEndTime = g_flIntermissionStartTime + MIN_INTERMISSION_TIME;
 		else
-			m_flIntermissionEndTime = g_flIntermissionStartTime + mp_chattime.value;
+			m_flIntermissionEndTime = g_flIntermissionStartTime + mp_chattime.GetInt();
 
 		// check to see if we should change levels now
 		if (m_flIntermissionEndTime < gpGlobals->time)
 		{
-			if (mp_intermission_skip_auto.value >= 1.0f && playerCount <= 1)
+			if (mp_intermission_skip_auto.GetInt() >= 1 && playerCount <= 1)
 			{
 				ChangeNextLevel();
 				return;
 			}
 
 			if (m_iEndIntermissionButtonHit // check that someone has pressed a key, or the max intermission time is over
-			    || ((g_flIntermissionStartTime + mp_intermission_time.value) < gpGlobals->time))
+			    || ((g_flIntermissionStartTime + mp_intermission_time.GetInt()) < gpGlobals->time))
 			//				ChangeLevel(); // intermission is over
 			//++ BulliT
 			{
@@ -265,8 +265,8 @@ void CHalfLifeMultiplay ::Think(void)
 
 	//++ BulliT
 	/*
-  float flTimeLimit = timelimit.value * 60;
-  float flFragLimit = fraglimit.value;
+  float flTimeLimit = timelimit.GetFloat() * 60;
+  float flFragLimit = fraglimit.GetFloat();
 
   time_remaining = (int)(flTimeLimit ? ( flTimeLimit - gpGlobals->time ) : 0);
 
@@ -291,7 +291,7 @@ void CHalfLifeMultiplay ::Think(void)
 			time_remaining = 0;
 		}
 	}
-	float flFragLimit = fraglimit.value;
+	float flFragLimit = fraglimit.GetFloat();
 	//-- Martin Webrant
 
 	if (flFragLimit)
@@ -325,13 +325,13 @@ void CHalfLifeMultiplay ::Think(void)
 	// Updates when frags change
 	if (frags_remaining != last_frags)
 	{
-		g_engfuncs.pfnCvar_DirectSet(&fragsleft, UTIL_VarArgs("%i", frags_remaining));
+		g_engfuncs.pfnCvar_DirectSet(fragsleft.GetCvar(), UTIL_VarArgs("%i", frags_remaining));
 	}
 
 	// Updates once per second
-	if (timeleft.value != last_time)
+	if (timeleft.GetFloat() != last_time)
 	{
-		g_engfuncs.pfnCvar_DirectSet(&timeleft, UTIL_VarArgs("%i", time_remaining));
+		g_engfuncs.pfnCvar_DirectSet(timeleft.GetCvar(), UTIL_VarArgs("%i", time_remaining));
 	}
 
 	last_frags = frags_remaining;
@@ -600,7 +600,7 @@ void CHalfLifeMultiplay ::ClientDisconnected(edict_t *pClient)
 //=========================================================
 float CHalfLifeMultiplay ::FlPlayerFallDamage(CBasePlayer *pPlayer)
 {
-	int iFallDamage = (int)falldamage.value;
+	int iFallDamage = (int)falldamage.GetBool();
 
 	switch (iFallDamage)
 	{
@@ -691,7 +691,7 @@ float CHalfLifeMultiplay ::FlPlayerSpawnTime(CBasePlayer *pPlayer)
 
 bool CHalfLifeMultiplay ::AllowAutoTargetCrosshair(void)
 {
-	return (aimcrosshair.value != 0);
+	return (aimcrosshair.GetBool());
 }
 
 //=========================================================
@@ -1006,7 +1006,7 @@ void CHalfLifeMultiplay ::PlayerGotWeapon(CBasePlayer *pPlayer, CBasePlayerItem 
 //=========================================================
 float CHalfLifeMultiplay ::FlWeaponRespawnTime(CBasePlayerItem *pWeapon)
 {
-	if (weaponstay.value > 0)
+	if (weaponstay.GetBool())
 	{
 		// make sure it's only certain weapons
 		if (!(pWeapon->iFlags() & ITEM_FLAG_LIMITINWORLD))
@@ -1070,7 +1070,7 @@ int CHalfLifeMultiplay ::WeaponShouldRespawn(CBasePlayerItem *pWeapon)
 //=========================================================
 bool CHalfLifeMultiplay::CanHavePlayerItem(CBasePlayer *pPlayer, CBasePlayerItem *pItem)
 {
-	if (weaponstay.value > 0)
+	if (weaponstay.GetBool())
 	{
 		if (pItem->iFlags() & ITEM_FLAG_LIMITINWORLD)
 			//++ BulliT
@@ -1258,14 +1258,14 @@ bool CHalfLifeMultiplay ::PlayFootstepSounds(CBasePlayer *pl, float fvol)
 
 bool CHalfLifeMultiplay ::FAllowFlashlight(void)
 {
-	return flashlight.value != 0;
+	return flashlight.GetBool();
 }
 
 //=========================================================
 //=========================================================
 bool CHalfLifeMultiplay ::FAllowMonsters(void)
 {
-	return (allowmonsters.value != 0);
+	return (allowmonsters.GetBool());
 }
 
 //=========================================================
@@ -1285,7 +1285,7 @@ void CHalfLifeMultiplay ::GoToIntermission(void)
 
 	ClampIntermissionTime();
 
-	m_flIntermissionEndTime = gpGlobals->time + ((int)mp_chattime.value);
+	m_flIntermissionEndTime = gpGlobals->time + ((int)mp_chattime.GetInt());
 	g_flIntermissionStartTime = gpGlobals->time;
 
 	g_fGameOver = true;
@@ -1303,8 +1303,8 @@ void CHalfLifeMultiplay::ClampIntermissionTime()
 	else if (maxTime < MIN_INTERMISSION_TIME)
 		CVAR_SET_FLOAT("mp_intermission_time", MIN_INTERMISSION_TIME);
 
-	if (time > mp_intermission_time.value)
-		CVAR_SET_FLOAT("mp_chattime", mp_intermission_time.value);
+	if (time > mp_intermission_time.GetInt())
+		CVAR_SET_FLOAT("mp_chattime", mp_intermission_time.GetInt());
 	else if (time < MIN_INTERMISSION_TIME)
 		CVAR_SET_FLOAT("mp_chattime", MIN_INTERMISSION_TIME);
 }

@@ -281,7 +281,7 @@ void CBasePlayer::Spectate_Nextplayer(bool bReverse)
 		if (((CBasePlayer *)pEnt)->IsSpectator() || (pEnt->pev->effects == EF_NODRAW))
 			continue;
 
-		if (0 < ag_spec_enable_disable.value && ((CBasePlayer *)pEnt)->DisableSpecs())
+		if (ag_spec_enable_disable.GetBool() && ((CBasePlayer *)pEnt)->DisableSpecs())
 			continue;
 
 		m_hSpectateTarget = pEnt;

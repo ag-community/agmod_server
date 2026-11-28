@@ -560,14 +560,14 @@ int CBasePlayer ::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, fl
 	flOriginalDamage = flDamage;
 
 	if (this == pAttacker)
-		flDamage *= ag_selfdamage.value;
+		flDamage *= ag_selfdamage.GetBool();
 
 	// go take the damage first
 
 	// keep track of amount of damage last sustained
 	m_lastDamageAmount = flDamage;
 
-	if (pAttacker && IsBot() && ag_match_running.value == 0)
+	if (pAttacker && IsBot() && !ag_match_running.GetBool())
 	{
 		if (pAttacker->pev->flags & FL_CLIENT)
 			UTIL_DispatchChat(pAttacker, ChatType::DAMAGE, UTIL_VarArgs("%s received %.1f damage from %s\n", GetName(), flDamage, pAttacker->GetName()));
@@ -609,12 +609,12 @@ int CBasePlayer ::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, fl
 	{
 		// When it's self-damage we try to conserve the boost given by the damage that you would have taken
 		const auto realHpDamage = (int)flDamage;
-		auto boostedDamage = flOriginalDamage * ag_selfdamage_boost.value;
+		auto boostedDamage = flOriginalDamage * ag_selfdamage_boost.GetBool();
 
 		// Little hack to not die in CBaseMonster::TakeDamage
 		pev->health += (boostedDamage + 2);
 
-		if (ag_gauss_fix.value >= 3.0f && pAttacker->m_pActiveItem->m_iId == WEAPON_GAUSS)
+		if (ag_gauss_fix.GetInt() >= 3 && pAttacker->m_pActiveItem->m_iId == WEAPON_GAUSS)
 		{
 
 			CBaseMonster::TakeDamage(pevInflictor, pevAttacker, boostedDamage, bitsDamageType);
@@ -1116,7 +1116,7 @@ void CBasePlayer::Killed(entvars_t *pevAttacker, int iGib)
 	{
 		pev->solid = SOLID_NOT;
 		//++ BulliT
-		if (0 < ag_show_gibs.value)
+		if (ag_show_gibs.GetBool())
 			GibMonster(); // This clears pev->model
 		//-- Martin Webrant
 		pev->effects |= EF_NODRAW;
@@ -1480,9 +1480,9 @@ void CBasePlayer::PlayerDeathThink(void)
 	if (pev->modelindex && (!m_fSequenceFinished) && (pev->deadflag == DEAD_DYING))
 		StudioFrameAdvance();
 
-	auto minRespawnTime = min(ag_min_respawn_time.value, 120.0f);
+	auto minRespawnTime = min(ag_min_respawn_time.GetFloat(), 120.0f);
 	if (CVAR_GET_FLOAT("mp_forcerespawn") > 0.0f)
-		minRespawnTime = min(minRespawnTime, ag_forcerespawn_time.value);
+		minRespawnTime = min(minRespawnTime, ag_forcerespawn_time.GetFloat());
 
 	if (minRespawnTime > (gpGlobals->time - m_flLastUnaliveTime))
 		return;
@@ -1529,7 +1529,7 @@ void CBasePlayer::PlayerDeathThink(void)
 	// wait for any button down,  or mp_forcerespawn is set and the respawn time is up
 	//++ BulliT
 	// Don't trigg on any button - just attack button.
-	if (!(pev->button & IN_ATTACK || pev->button & IN_USE) && !(g_pGameRules->IsMultiplayer() && CVAR_GET_FLOAT("mp_forcerespawn") > 0 && (gpGlobals->time > (m_flLastUnaliveTime + ag_forcerespawn_time.value))))
+	if (!(pev->button & IN_ATTACK || pev->button & IN_USE) && !(g_pGameRules->IsMultiplayer() && CVAR_GET_FLOAT("mp_forcerespawn") > 0 && (gpGlobals->time > (m_flLastUnaliveTime + ag_forcerespawn_time.GetFloat()))))
 		return;
 	//-- Martin Webrant
 
@@ -2041,7 +2041,7 @@ void CBasePlayer::PreThink(void)
 	if (g_fGameOver)
 		return; // intermission or finale
 
-	if (ag_unstuck_on_changelevel.value != 0.0f && g_isUsingChangelevelTrigger && IsStuck())
+	if (ag_unstuck_on_changelevel.GetBool() && g_isUsingChangelevelTrigger && IsStuck())
 		UnstuckTowardsChangelevel();
 
 	g_isUsingChangelevelTrigger = false;
@@ -2049,7 +2049,7 @@ void CBasePlayer::PreThink(void)
 	if (m_fFpsMaxNextQuery <= gpGlobals->time && !(pev->flags & FL_FAKECLIENT))
 	{
 		g_engfuncs.pfnQueryClientCvarValue2(edict(), "fps_max", request_ids::REQUEST_ID_FPS_MAX);
-		m_fFpsMaxNextQuery = gpGlobals->time + ag_fps_limit_check_interval.value;
+		m_fFpsMaxNextQuery = gpGlobals->time + ag_fps_limit_check_interval.GetFloat();
 	}
 
 	//++ BulliT
@@ -2064,7 +2064,7 @@ void CBasePlayer::PreThink(void)
 		const auto spawnSystem = spawnSystemName[(int)CVAR_GET_FLOAT("ag_spawn_system")];
 
 		MESSAGE_BEGIN(MSG_ONE_UNRELIABLE, gmsgSettings, NULL, pev);
-		WRITE_BYTE((int)ag_match_running.value);
+		WRITE_BYTE((int)ag_match_running.GetBool());
 		WRITE_STRING(AgGamename().c_str());
 		WRITE_BYTE((int)CVAR_GET_FLOAT("mp_timelimit"));
 		WRITE_BYTE((int)CVAR_GET_FLOAT("mp_fraglimit"));
@@ -2841,7 +2841,7 @@ void CBasePlayer::PostThink()
 		}
 	}
 
-	if (gpGlobals->time < m_flInputFixReady && singleplayer.value > 0.0f && m_iLoading == 0)
+	if (gpGlobals->time < m_flInputFixReady && singleplayer.GetFloat() > 0.0f && m_iLoading == 0)
 	{
 		// HACK: Some players have an invisible menu popping up and preventing them from
 		// moving the mouse when they spawn in c1a0 for instance, so we fix it with this
@@ -2926,7 +2926,7 @@ void CBasePlayer::PostThink()
 	//  // Track button info so we can detect 'pressed' and 'released' buttons next frame
 	//  m_afButtonLast = pev->button;
 
-	if (ag_fps_limit_auto.value == 0.0f && ShouldLimitFps())
+	if (!ag_fps_limit_auto.GetBool() && ShouldLimitFps())
 	{
 		// When the fps limiter is set to auto, it handles the limitation in another place at a different interval (not every frame),
 		// so to simplify this and leave some room for the limit to change, we call `LimitFps()` in 2 different places depending on auto...
@@ -2952,7 +2952,7 @@ void CBasePlayer::PostThink()
 	}
 	else
 	{
-		if (0 < ag_lj_timer.value)
+		if (0 < ag_lj_timer.GetInt())
 			LongjumpThink();
 	}
 	//-- Martin Webrant
@@ -3073,11 +3073,11 @@ edict_t *EntSelectSpawnPoint(CBasePlayer *pPlayer)
 	}
 	else if (g_pGameRules->IsDeathmatch())
 	{
-		ALERT(at_aiconsole, "ag_spawn_system is %0.f\n", ag_spawn_system.value);
+		ALERT(at_aiconsole, "ag_spawn_system is %0.f\n", ag_spawn_system.GetInt());
 
 		CSpawnChooser spawnChooser { pPlayer, pLastSpot };
 
-		switch ((int)ag_spawn_system.value)
+		switch ((int)ag_spawn_system.GetInt())
 		{
 		case 0:
 			pSpot = spawnChooser.GetClassicSpawnPoint();
@@ -3146,7 +3146,7 @@ ReturnSpot:
 	}
 	g_spawnHistory.push_back(pSpot);
 
-	if (g_spawnHistory.size() > ag_spawn_history_entries.value)
+	if (g_spawnHistory.size() > ag_spawn_history_entries.GetInt())
 		g_spawnHistory.erase(g_spawnHistory.begin());
 
 	return pSpot->edict();
@@ -3213,7 +3213,7 @@ void CBasePlayer::Spawn(void)
 	g_pGameRules->SetDefaultPlayerTeam(this);
 	g_pGameRules->GetPlayerSpawnSpot(this);
 
-	if (IsBot() && ag_match_running.value == 0)
+	if (IsBot() && !ag_match_running.GetBool())
 	{
 		const auto lastSpawn = g_spawnHistory[g_spawnHistory.size() - 1];
 		short spotNumber = -1;
@@ -3286,7 +3286,7 @@ void CBasePlayer::Spawn(void)
 	}
 	//-- Martin Webrant
 
-	if (singleplayer.value > 0.0f)
+	if (singleplayer.GetFloat() > 0.0f)
 	{
 		m_flInputFixReady = gpGlobals->time + (gpGlobals->frametime * INPUT_FIX_FRAMES);
 	}
@@ -3887,7 +3887,7 @@ void CBasePlayer::ImpulseCommands()
 
 		if (tr.flFraction != 1.0)
 		{ // line hit something, so paint a decal
-			m_flNextDecalTime = gpGlobals->time + decalfrequency.value;
+			m_flNextDecalTime = gpGlobals->time + decalfrequency.GetInt();
 			CSprayCan *pCan = GetClassPtr((CSprayCan *)NULL);
 			pCan->Spawn(pev);
 		}
@@ -3911,7 +3911,7 @@ void CBasePlayer::ImpulseCommands()
 //=========================================================
 void CBasePlayer::CheatImpulseCommands(int iImpulse)
 {
-	if (!AgIsLocalServer() && singleplayer.value == 0.0f)
+	if (!AgIsLocalServer() && singleplayer.GetFloat() == 0.0f)
 		return;
 
 #if !defined(HLDEMO_BUILD)
@@ -4363,7 +4363,7 @@ void CBasePlayer ::UpdateClientData(void)
 			WRITE_BYTE(1); // slopebug = ON
 			MESSAGE_END();
 
-			if (0 < ag_match_running.value)
+			if (ag_match_running.GetBool())
 				g_pGameRules->m_ScoreCache.RestoreScore(this);
 			g_pGameRules->m_ScoreCache.UpdateScore(this);
 
@@ -4738,7 +4738,7 @@ void CBasePlayer ::UpdateClientData(void)
 #endif
 		{
 			MESSAGE_BEGIN(MSG_ONE, gmsgCheatCheck, NULL, pev);
-			WRITE_BYTE((int)ag_pure.value);
+			WRITE_BYTE((int)ag_pure.GetBool());
 			MESSAGE_END();
 		}
 	}
@@ -4748,7 +4748,7 @@ void CBasePlayer ::UpdateClientData(void)
 
 	//-- Martin Webrant
 
-	if (singleplayer.value >= 0.0f && m_iLoading == 2)
+	if (singleplayer.GetFloat() >= 0.0f && m_iLoading == 2)
 	{
 		// FIXME: HACK to avoid a bug on saveloads, where mouse input does nothing ingame,
 		// apparently because an invisible menu pops up. Only happens to a few speedrunners...
@@ -5075,7 +5075,7 @@ void CBasePlayer::DropPlayerItem(char *pszItemName)
 	if (FStrEq(pszItemName, "flag") && CTF == AgGametype())
 		g_pGameRules->m_CTF.PlayerDropFlag(this, true);
 	//-- Martin Webrant
-	if (weaponstay.value > 0)
+	if (weaponstay.GetBool())
 	{
 		// no dropping in single player.
 		return;
@@ -5318,16 +5318,16 @@ void CStripWeapons ::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE
 	if (pPlayer)
 		pPlayer->RemoveAllItems(false);
 
-	if (ag_unlimited_uranium.value != 0.0f)
+	if (ag_unlimited_uranium.GetBool())
 	{
-		if (ag_start_gauss.value > 0.0f)
+		if (ag_start_gauss.GetInt() > 0)
 			pPlayer->GiveNamedItem("weapon_gauss");
 
-		if (ag_start_egon.value > 0.0f)
+		if (ag_start_egon.GetInt() > 0)
 			pPlayer->GiveNamedItem("weapon_egon");
 
-		if (ag_start_uranium.value > 0.0f)
-			pPlayer->GiveAmmo(ag_start_uranium.value, "uranium", URANIUM_MAX_CARRY);
+		if (ag_start_uranium.GetInt() > 0)
+			pPlayer->GiveAmmo(ag_start_uranium.GetInt(), "uranium", URANIUM_MAX_CARRY);
 	}
 }
 
@@ -5415,7 +5415,7 @@ void CRevertSaved ::MessageThink(void)
 
 void CRevertSaved ::LoadThink(void)
 {
-	if (!gpGlobals->deathmatch || singleplayer.value != 0.0f)
+	if (!gpGlobals->deathmatch || singleplayer.GetFloat() != 0.0f)
 	{
 		SERVER_COMMAND("reload\n");
 	}
@@ -5477,7 +5477,7 @@ CBasePlayer *FindPlayerForward(CBasePlayer *pMe)
 void CBasePlayer::UpdatePlayerId()
 {
 	// Player id
-	if (ag_player_id.value > 0 && NULL != pev)
+	if (ag_player_id.GetInt() > 0 && NULL != pev)
 	{
 		// If we should test
 		if (m_fPlayerIdCheck < gpGlobals->time)
@@ -5647,11 +5647,11 @@ void CBasePlayer::ChangeTeam(const char *pszNewTeam, bool bSendScores)
 // Long jump
 void CBasePlayer::OnPickupLongjump()
 {
-	m_fLongjumpTimer = gpGlobals->time + ag_lj_timer.value;
-	if (0 < ag_lj_timer.value)
+	m_fLongjumpTimer = gpGlobals->time + ag_lj_timer.GetInt();
+	if (0 < ag_lj_timer.GetInt())
 	{
 		MESSAGE_BEGIN(MSG_ONE, gmsgLongjump, NULL, pev);
-		WRITE_BYTE((int)ag_lj_timer.value);
+		WRITE_BYTE((int)ag_lj_timer.GetInt());
 		MESSAGE_END();
 	}
 }
@@ -5671,10 +5671,10 @@ void CBasePlayer::LongjumpThink()
 bool CBasePlayer::FloodCheck()
 {
 	// Dont check for admins, or when a match is on.
-	if (ag_match_running.value || IsAdmin())
+	if (ag_match_running.GetBool() || IsAdmin())
 		return false;
 
-	if (ag_floodmsgs.value)
+	if (ag_floodmsgs.GetInt())
 	{
 		if (AgTime() < m_fFloodLockTill)
 		{
@@ -5684,16 +5684,16 @@ bool CBasePlayer::FloodCheck()
 			return true;
 		}
 		int nMax = (sizeof(m_afFloodWhen) / sizeof(m_afFloodWhen[0]));
-		int i = m_iFloodWhenHead - ag_floodmsgs.value + 1;
+		int i = m_iFloodWhenHead - ag_floodmsgs.GetInt() + 1;
 
 		if (i < 0)
 			i = nMax + i;
 
-		if (m_afFloodWhen[i] && AgTime() - m_afFloodWhen[i] < ag_floodpersecond.value)
+		if (m_afFloodWhen[i] && AgTime() - m_afFloodWhen[i] < ag_floodpersecond.GetInt())
 		{
 			char szText[256];
-			m_fFloodLockTill = AgTime() + ag_floodwaitdelay.value;
-			sprintf(szText, "Flood protection: You can't talk for %d seconds\n", (int)(ag_floodwaitdelay.value));
+			m_fFloodLockTill = AgTime() + ag_floodwaitdelay.GetInt();
+			sprintf(szText, "Flood protection: You can't talk for %d seconds\n", (int)(ag_floodwaitdelay.GetInt()));
 			UTIL_SayText(szText, this);
 			return true;
 		}
@@ -5747,7 +5747,7 @@ bool CBasePlayer::FloodSound()
 
 bool CBasePlayer::FloodText()
 {
-	if (ag_match_running.value || IsAdmin())
+	if (ag_match_running.GetBool() || IsAdmin())
 		return false;
 
 	if (m_fPrevTextFlood > AgTime())
@@ -5769,9 +5769,9 @@ bool CBasePlayer::HasNameFlooded()
 
 	double interval = 0;
 	if (IsSpectator())
-		interval = ag_flood_name_spec_cooldown.value;
+		interval = ag_flood_name_spec_cooldown.GetInt();
 	else
-		interval = ag_flood_name_cooldown.value;
+		interval = ag_flood_name_cooldown.GetInt();
 
 	if (m_flLastNameChange + interval > AgTime())
 		return true;
@@ -5789,9 +5789,9 @@ bool CBasePlayer::HasModelFlooded()
 
 	double interval = 0;
 	if (IsSpectator())
-		interval = ag_flood_model_spec_cooldown.value;
+		interval = ag_flood_model_spec_cooldown.GetInt();
 	else
-		interval = ag_flood_model_cooldown.value;
+		interval = ag_flood_model_cooldown.GetInt();
 
 	if (m_flLastModelChange + interval > AgTime())
 	{
@@ -5812,11 +5812,11 @@ bool CBasePlayer::HasModelEnforced()
 	if (IsBot())
 		return false;
 
-	if (m_flLastModelEnforcement + ag_enforcement_cooldown.value > AgTime())
+	if (m_flLastModelEnforcement + ag_enforcement_cooldown.GetInt() > AgTime())
 	{
 		char text[128];
 		sprintf(text, "You can't change your model for %.1f more seconds due to model enforcement\n",
-		    m_flLastModelEnforcement + ag_enforcement_cooldown.value - AgTime());
+		    m_flLastModelEnforcement + ag_enforcement_cooldown.GetInt() - AgTime());
 		UTIL_SayText(text, this);
 		return true;
 	}
@@ -5832,11 +5832,11 @@ bool CBasePlayer::HasSpecEnforced()
 	if (IsBot())
 		return false;
 
-	if (m_flLastSpecEnforcement + ag_enforcement_cooldown.value > AgTime())
+	if (m_flLastSpecEnforcement + ag_enforcement_cooldown.GetInt() > AgTime())
 	{
 		char text[128];
 		sprintf(text, "You can't change your spec mode for %.1f more seconds due to spec enforcement\n",
-		    m_flLastSpecEnforcement + ag_enforcement_cooldown.value - AgTime());
+		    m_flLastSpecEnforcement + ag_enforcement_cooldown.GetInt() - AgTime());
 		UTIL_SayText(text, this);
 		return true;
 	}
@@ -6107,11 +6107,11 @@ bool CBasePlayer::ShouldLimitFps()
 	if (IsSpectator() || IsProxy() || (pev->flags & FL_FAKECLIENT))
 		return false;
 
-	if (ag_fps_limit_match_only.value == 0)
+	if (!ag_fps_limit_match_only.GetBool())
 		return true;
 	else
 	{
-		if (ag_match_running.value > 0)
+		if (ag_match_running.GetBool())
 		{
 			// It's set to limit fps during a match, and you're playing in the match so we gotta limit your fps
 			return true;
@@ -6125,7 +6125,7 @@ bool CBasePlayer::ShouldLimitFps()
 // but having a higher fps_max helps them have a higher average fps; kinda edge case
 void CBasePlayer::LimitFps()
 {
-	auto fpsLimit = ag_fps_limit.value;
+	auto fpsLimit = static_cast<float>(ag_fps_limit.GetInt());
 
 	if (fpsLimit == 0)
 		return;
@@ -6136,7 +6136,7 @@ void CBasePlayer::LimitFps()
 		CVAR_SET_FLOAT("ag_fps_limit", MIN_FPS_LIMIT);
 	}
 
-	if (ag_fps_limit_steampipe.value > 0)
+	if (ag_fps_limit_steampipe.GetBool())
 		fpsLimit -= 0.5;
 
 	if (fpsLimit >= m_flFpsMax)
@@ -6146,7 +6146,7 @@ void CBasePlayer::LimitFps()
 	{
 		CLIENT_COMMAND(edict(), "fps_max %.6f\n", fpsLimit);
 
-		m_flNextFpsWarning = gpGlobals->time + ag_fps_limit_warnings_interval.value;
+		m_flNextFpsWarning = gpGlobals->time + ag_fps_limit_warnings_interval.GetFloat();
 		m_iFpsWarnings++;
 
 		char text[80];
@@ -6154,22 +6154,22 @@ void CBasePlayer::LimitFps()
 		UTIL_SayText(text, this);
 	}
 
-	if (m_iFpsWarnings > ag_fps_limit_warnings.value)
+	if (m_iFpsWarnings > ag_fps_limit_warnings.GetInt())
 	{
-		const auto punishment = ag_fps_limit_punishment.string;
+		const auto punishment = ag_fps_limit_punishment.GetString();
 
 		if (FStrEq(punishment, "slap"))
 		{
 			if (m_flNextSlap < gpGlobals->time)
 			{
-				m_flNextSlap = gpGlobals->time + ag_fps_limit_punishment_slap_interval.value;
-				Slap(ag_fps_limit_punishment_slap_intensity.value);
+				m_flNextSlap = gpGlobals->time + ag_fps_limit_punishment_slap_interval.GetFloat();
+				Slap(ag_fps_limit_punishment_slap_intensity.GetFloat());
 			}
 		}
 		else if (FStrEq(punishment, "ban"))
 		{
 			char szCommand[96];
-			sprintf(szCommand, "banid %d #%d kick\n", static_cast<int>(ag_fps_limit_punishment_ban_time.value), GETPLAYERUSERID(edict()));
+			sprintf(szCommand, "banid %d #%d kick\n", static_cast<int>(ag_fps_limit_punishment_ban_time.GetInt()), GETPLAYERUSERID(edict()));
 			SERVER_COMMAND(szCommand);
 		}
 		else
@@ -6255,7 +6255,7 @@ void CBasePlayer::Init()
 	m_bInSpawn = false;
 
 	m_bAdmin = false;
-	m_bIngame = 1 > ag_match_running.value;
+	m_bIngame = !ag_match_running.GetBool();
 	m_bDoneFirstSpawn = false;
 
 	// TODO: review this. There's a `ag_player_id cvar` defaulted to 5, but its value is not
@@ -6280,18 +6280,18 @@ void CBasePlayer::Init()
 	m_fFloodLockTill = AgTime();
 	for (int i = 0; i < sizeof(m_afFloodWhen) / sizeof(m_afFloodWhen[0]); i++)
 	{
-		m_afFloodWhen[i] = AgTime() - ag_floodpersecond.value;
+		m_afFloodWhen[i] = AgTime() - ag_floodpersecond.GetInt();
 	}
 	m_iFloodWhenHead = 0;
 
 	m_fPrevSoundFlood = AgTime();
 	m_fPrevTextFlood = AgTime();
 
-	m_flLastNameChange = AgTime() - max(ag_flood_name_spec_cooldown.value, ag_flood_name_cooldown.value) - 0.001f;
-	m_flLastModelChange = AgTime() - max(ag_flood_model_spec_cooldown.value, ag_flood_model_cooldown.value) - 0.001f;
+	m_flLastNameChange = AgTime() - max(ag_flood_name_spec_cooldown.GetInt(), ag_flood_name_cooldown.GetInt()) - 0.001f;
+	m_flLastModelChange = AgTime() - max(ag_flood_model_spec_cooldown.GetInt(), ag_flood_model_cooldown.GetInt()) - 0.001f;
 
-	m_flLastModelEnforcement = AgTime() - ag_enforcement_cooldown.value - 0.001f;
-	m_flLastSpecEnforcement = AgTime() - ag_enforcement_cooldown.value - 0.001f;
+	m_flLastModelEnforcement = AgTime() - ag_enforcement_cooldown.GetInt() - 0.001f;
+	m_flLastSpecEnforcement = AgTime() - ag_enforcement_cooldown.GetInt() - 0.001f;
 
 	m_flLastGamemodeVarsRequest = AgTime() - GAMEMODE_VARS_REQUEST_COOLDOWN;
 
@@ -6318,7 +6318,7 @@ void CBasePlayer::Init()
 	{
 		g_pGameRules->m_CTF.ClientConnected(this);
 
-		if (1 == ag_match_running.value)
+		if (ag_match_running.GetBool())
 		{
 			// Check score cache if he was in the game.
 			g_pGameRules->m_ScoreCache.RestoreInGame(this);
@@ -6326,14 +6326,14 @@ void CBasePlayer::Init()
 	}
 	else
 	{
-		if (1 == ag_match_running.value)
+		if (ag_match_running.GetBool())
 		{
 			// Check score cache if he was in the game.
 			g_pGameRules->m_ScoreCache.RestoreInGame(this);
 		}
 	}
 
-	if (0 < ag_auto_admin.value)
+	if (ag_auto_admin.GetBool())
 	{
 		// Autoadmin the player.
 		AdminCache.RestoreAdmin(this);
@@ -6365,7 +6365,7 @@ void CBasePlayer::Init()
 
 	m_flFpsMax = 0.0;
 	m_iFpsWarnings = 0;
-	m_flNextFpsWarning = gpGlobals->time + ag_fps_limit_warnings_interval.value;
+	m_flNextFpsWarning = gpGlobals->time + ag_fps_limit_warnings_interval.GetFloat();
 	m_flNextSlap = gpGlobals->time;
 
 	// Game reuses player instances, so at least in the case of bots, this is still populated with the last disconnected bot's name
@@ -6393,7 +6393,7 @@ void CBasePlayer::StopGameRecording()
 
 void CBasePlayer::TakeEndScreenshot()
 {
-	if (ag_force_take_end_screenshot.value == 0.0f || m_bEndScreenshotTaken)
+	if (!ag_force_take_end_screenshot.GetBool() || m_bEndScreenshotTaken)
 		return;
 
 	// We force the client to display the scoreboard because it is not being
@@ -6405,10 +6405,10 @@ void CBasePlayer::TakeEndScreenshot()
 
 void CBasePlayer::TakeDeathScreenshot()
 {
-	if (ag_force_take_death_screenshot.value == 0.0f || m_bDeathScreenshotTaken)
+	if (!ag_force_take_death_screenshot.GetBool() || m_bDeathScreenshotTaken)
 		return;
 
-	if (RANDOM_LONG(0, 100) <= ag_force_take_death_screenshot_chance.value)
+	if (RANDOM_LONG(0, 100) <= ag_force_take_death_screenshot_chance.GetInt())
 	{
 		hudtextparms_t hText;
 		memset(&hText, 0, sizeof(hText));
@@ -6479,7 +6479,7 @@ void CBasePlayer::Unstuck(Vector towardsPoint)
 {
 	const auto amountToMove = (pev->origin - towardsPoint).Normalized();
 
-	for (auto i = static_cast<int>(ag_unstuck_max_attempts.value); i > 0; i--)
+	for (auto i = static_cast<int>(ag_unstuck_max_attempts.GetInt()); i > 0; i--)
 	{
 		pev->origin = pev->origin - amountToMove;
 
