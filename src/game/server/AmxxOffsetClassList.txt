@@ -181,7 +181,6 @@ CPathCorner
 CPathTrack
 CPendulum
 CPlatTrigger
-CPlayerMonster
 CPointEntity
 CPushable
 CPython

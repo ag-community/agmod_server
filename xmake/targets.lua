@@ -6,16 +6,6 @@ target("server")
     add_files(ag.path("src/game/server/*.cpp"))
     add_files(ag.path("src/game/server/ag/*.cpp"))
     add_files(ag.path("src/game/server/ag/gamemodes/*.cpp"))
-    add_files(ag.path("src/game/server/wpn_shared/*.cpp"))
-    -- glock is built from wpn_shared, the rest is unused.
-    remove_files(
-        ag.path("src/game/server/AI_BaseNPC_Schedule.cpp"),
-        ag.path("src/game/server/glock.cpp"),
-        ag.path("src/game/server/mpstubb.cpp"),
-        ag.path("src/game/server/playermonster.cpp"),
-        ag.path("src/game/server/stats.cpp"),
-        ag.path("src/game/server/Wxdebug.cpp"))
-
     add_files(ag.path("src/common/parsemsg.cpp"))
     add_files(ag.path("src/game/shared/mathlib.cpp"))
     add_files(ag.path("src/pm_shared/*.cpp"))
