@@ -16,6 +16,7 @@
 // skill.cpp - code for skill level concerns
 //=========================================================
 #include "extdll.h"
+#include "convar.h"
 #include "util.h"
 #include "skill.h"
 
@@ -33,7 +34,7 @@ float GetSkillCvar(char *pName)
 
 	iCount = sprintf(szBuffer, "%s%d", pName, gSkillData.iSkillLevel);
 
-	flValue = CVAR_GET_FLOAT(szBuffer);
+	flValue = ConVarRef(szBuffer).GetFloat();
 
 	if (flValue <= 0)
 	{

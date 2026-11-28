@@ -21,6 +21,7 @@
 */
 
 #include "extdll.h"
+#include "convar.h"
 #include "util.h"
 #include "cbase.h"
 #include "monsters.h"
@@ -296,7 +297,7 @@ void CBaseMonster ::GibMonster(void)
 	// only humans throw skulls !!!UNDONE - eventually monsters will have their own sets of gibs
 	if (HasHumanGibs())
 	{
-		if (CVAR_GET_FLOAT("violence_hgibs") != 0) // Only the player will ever get here
+		if (ConVarRef("violence_hgibs").GetBool()) // Only the player will ever get here
 		{
 			CGib::SpawnHeadGib(pev);
 			CGib::SpawnRandomGibs(pev, 4, 1); // throw some human gibs.
@@ -305,7 +306,7 @@ void CBaseMonster ::GibMonster(void)
 	}
 	else if (HasAlienGibs())
 	{
-		if (CVAR_GET_FLOAT("violence_agibs") != 0) // Should never get here, but someone might call it directly
+		if (ConVarRef("violence_agibs").GetBool()) // Should never get here, but someone might call it directly
 		{
 			CGib::SpawnRandomGibs(pev, 4, 0); // Throw alien gibs
 		}

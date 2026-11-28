@@ -21,6 +21,7 @@
 */
 
 #include "extdll.h"
+#include "convar.h"
 #include "util.h"
 #include "cbase.h"
 
@@ -164,11 +165,11 @@ void CEnvLight::KeyValue(KeyValueData *pkvd)
 
 		pkvd->fHandled = true;
 		sprintf(szColor, "%d", r);
-		CVAR_SET_STRING("sv_skycolor_r", szColor);
+		ConVarRef("sv_skycolor_r").SetValue(szColor);
 		sprintf(szColor, "%d", g);
-		CVAR_SET_STRING("sv_skycolor_g", szColor);
+		ConVarRef("sv_skycolor_g").SetValue(szColor);
 		sprintf(szColor, "%d", b);
-		CVAR_SET_STRING("sv_skycolor_b", szColor);
+		ConVarRef("sv_skycolor_b").SetValue(szColor);
 	}
 	else
 	{
@@ -182,11 +183,11 @@ void CEnvLight ::Spawn(void)
 	UTIL_MakeAimVectors(pev->angles);
 
 	sprintf(szVector, "%f", gpGlobals->v_forward.x);
-	CVAR_SET_STRING("sv_skyvec_x", szVector);
+	ConVarRef("sv_skyvec_x").SetValue(szVector);
 	sprintf(szVector, "%f", gpGlobals->v_forward.y);
-	CVAR_SET_STRING("sv_skyvec_y", szVector);
+	ConVarRef("sv_skyvec_y").SetValue(szVector);
 	sprintf(szVector, "%f", gpGlobals->v_forward.z);
-	CVAR_SET_STRING("sv_skyvec_z", szVector);
+	ConVarRef("sv_skyvec_z").SetValue(szVector);
 
 	CLight::Spawn();
 }

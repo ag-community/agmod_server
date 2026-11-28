@@ -567,7 +567,7 @@ void AgCommand::Setting(const AgString &sSetting, const AgString &sValue, CBaseP
 	else
 	{
 		char szSetting[64];
-		sprintf(szSetting, "%s is \"%s\"", sSetting.c_str(), CVAR_GET_STRING(sSetting.c_str()));
+		sprintf(szSetting, "%s is \"%s\"", sSetting.c_str(), ConVarRef(sSetting.c_str()).GetString());
 		AgConsole(szSetting, pPlayer);
 	}
 }
@@ -679,13 +679,13 @@ void AgCommand::MaxTime()
 
 	auto maxLimit = ag_vote_mp_timelimit_high.GetInt();
 
-	if (CVAR_GET_FLOAT("mp_timelimit") >= maxLimit)
+	if (timelimit.GetFloat() >= maxLimit)
 	{
 		// The limit is already maxed out
 		return;
 	}
 
-	CVAR_SET_FLOAT("mp_timelimit", maxLimit);
+	timelimit.SetValue(maxLimit);
 }
 
 void AgCommand::MoreTime()
@@ -694,16 +694,16 @@ void AgCommand::MoreTime()
 	if (!g_pGameRules)
 		return;
 
-	auto timelimit = CVAR_GET_FLOAT("mp_timelimit");
+	auto currentTimelimit = timelimit.GetFloat();
 
-	if (timelimit == 0.0f)
+	if (currentTimelimit == 0.0f)
 	{
 		// There's no time limit, so we can't really add
 		// extra time to the limit if there isn't one...
 		return;
 	}
 
-	CVAR_SET_FLOAT("mp_timelimit", timelimit + ag_vote_extra_timelimit.GetInt());
+	timelimit.SetValue(currentTimelimit + ag_vote_extra_timelimit.GetInt());
 }
 
 void AgCommand::AddRespawningStaticBot(CBasePlayer *pPlayer)

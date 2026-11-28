@@ -117,7 +117,7 @@ void CGameRules::RefreshSkillData(void)
 {
 	int iSkill;
 
-	iSkill = (int)CVAR_GET_FLOAT("skill");
+	iSkill = ConVarRef("skill").GetInt();
 	g_iSkillLevel = iSkill;
 
 	if (iSkill < 1)
@@ -316,7 +316,7 @@ AgGameRules *InstallGameRules(void)
 {
 	CVar::StopRecordingStartupChanges();
 
-	if (singleplayer.GetFloat() > 0.0f)
+	if (singleplayer.GetBool())
 	{
 		SERVER_COMMAND("exec game.cfg\n");
 		SERVER_EXECUTE_HL();
@@ -344,17 +344,17 @@ AgGameRules *InstallGameRules(void)
 		// Detect CTF maps.
 		if (AgIsCTFMap(STRING(gpGlobals->mapname)))
 		{
-			AgString sGametype = CVAR_GET_STRING("sv_ag_gametype");
-			if (sGametype != "ctf" && NULL == strstr(CVAR_GET_STRING("sv_ag_gamemode"), "ctf"))
-				CVAR_SET_STRING("sv_ag_gamemode", "ctf");
+			AgString sGametype = ag_gametype.GetString();
+			if (sGametype != "ctf" && NULL == strstr(ag_gamemode.GetString(), "ctf"))
+				ag_gamemode.SetValue("ctf");
 		}
 
 		// Detect DOM maps.
 		if (AgIsDOMMap(STRING(gpGlobals->mapname)))
 		{
-			AgString sGametype = CVAR_GET_STRING("sv_ag_gametype");
+			AgString sGametype = ag_gametype.GetString();
 			if (sGametype != "dom")
-				CVAR_SET_STRING("sv_ag_gamemode", "dom");
+				ag_gamemode.SetValue("dom");
 		}
 	}
 

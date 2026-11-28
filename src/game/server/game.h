@@ -21,6 +21,8 @@
 extern void GameDLLInit(void);
 
 extern AgConVar displaysoundlist;
+extern AgConVar fragsleft;
+extern AgConVar timeleft;
 
 // multiplayer server rules
 extern AgConVar teamplay;

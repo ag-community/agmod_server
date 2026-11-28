@@ -21,7 +21,9 @@
 */
 
 #include "extdll.h"
+#include "convar.h"
 #include "util.h"
+#include "game.h"
 #include "cbase.h"
 #include "player.h"
 #include "saverestore.h"
@@ -507,7 +509,7 @@ void CBaseTrigger::InitTrigger()
 	pev->solid = SOLID_TRIGGER;
 	pev->movetype = MOVETYPE_NONE;
 	SET_MODEL(ENT(pev), STRING(pev->model)); // set size and link into world
-	if (CVAR_GET_FLOAT("showtriggers") == 0)
+	if (!ConVarRef("showtriggers").GetBool())
 		SetBits(pev->effects, EF_NODRAW);
 }
 
@@ -1392,7 +1394,7 @@ void CChangeLevel ::ChangeLevel(CBaseEntity *pActivator)
 	ASSERT(!FStrEq(m_szMapName, ""));
 
 	// Don't work in deathmatch
-	if (g_pGameRules->IsDeathmatch() && CVAR_GET_FLOAT("sv_singleplayer") == 0.0f)
+	if (g_pGameRules->IsDeathmatch() && !singleplayer.GetBool())
 		return;
 
 	// Some people are firing these multiple times in a frame, disable
@@ -1696,7 +1698,7 @@ void CLadder ::Precache(void)
 	// Do all of this in here because we need to 'convert' old saved games
 	pev->solid = SOLID_NOT;
 	pev->skin = CONTENTS_LADDER;
-	if (CVAR_GET_FLOAT("showtriggers") == 0)
+	if (!ConVarRef("showtriggers").GetBool())
 	{
 		pev->rendermode = kRenderTransTexture;
 		pev->renderamt = 0;
@@ -1904,7 +1906,7 @@ LINK_ENTITY_TO_CLASS(trigger_autosave, CTriggerSave);
 
 void CTriggerSave::Spawn(void)
 {
-	if (g_pGameRules->IsDeathmatch() && CVAR_GET_FLOAT("sv_singleplayer") == 0.0f)
+	if (g_pGameRules->IsDeathmatch() && !singleplayer.GetBool())
 	{
 		REMOVE_ENTITY(ENT(pev));
 		return;
@@ -1958,7 +1960,7 @@ void CTriggerEndSection::EndSectionUse(CBaseEntity *pActivator, CBaseEntity *pCa
 
 void CTriggerEndSection::Spawn(void)
 {
-	if (g_pGameRules->IsDeathmatch() && CVAR_GET_FLOAT("sv_singleplayer") == 0.0f)
+	if (g_pGameRules->IsDeathmatch() && !singleplayer.GetBool())
 	{
 		REMOVE_ENTITY(ENT(pev));
 		return;

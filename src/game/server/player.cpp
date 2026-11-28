@@ -22,6 +22,7 @@
 #include <algorithm>
 
 #include "extdll.h"
+#include "convar.h"
 #include "util.h"
 
 #include "cbase.h"
@@ -1481,7 +1482,7 @@ void CBasePlayer::PlayerDeathThink(void)
 		StudioFrameAdvance();
 
 	auto minRespawnTime = min(ag_min_respawn_time.GetFloat(), 120.0f);
-	if (CVAR_GET_FLOAT("mp_forcerespawn") > 0.0f)
+	if (forcerespawn.GetBool())
 		minRespawnTime = min(minRespawnTime, ag_forcerespawn_time.GetFloat());
 
 	if (minRespawnTime > (gpGlobals->time - m_flLastUnaliveTime))
@@ -1529,7 +1530,7 @@ void CBasePlayer::PlayerDeathThink(void)
 	// wait for any button down,  or mp_forcerespawn is set and the respawn time is up
 	//++ BulliT
 	// Don't trigg on any button - just attack button.
-	if (!(pev->button & IN_ATTACK || pev->button & IN_USE) && !(g_pGameRules->IsMultiplayer() && CVAR_GET_FLOAT("mp_forcerespawn") > 0 && (gpGlobals->time > (m_flLastUnaliveTime + ag_forcerespawn_time.GetFloat()))))
+	if (!(pev->button & IN_ATTACK || pev->button & IN_USE) && !(g_pGameRules->IsMultiplayer() && forcerespawn.GetBool() && (gpGlobals->time > (m_flLastUnaliveTime + ag_forcerespawn_time.GetFloat()))))
 		return;
 	//-- Martin Webrant
 
@@ -2061,19 +2062,19 @@ void CBasePlayer::PreThink(void)
 	if (m_fDisplayGamemode > 0 && m_fDisplayGamemode < gpGlobals->time)
 	{
 		// Print gameinfo text.
-		const auto spawnSystem = spawnSystemName[(int)CVAR_GET_FLOAT("ag_spawn_system")];
+		const auto spawnSystem = spawnSystemName[ag_spawn_system.GetInt()];
 
 		MESSAGE_BEGIN(MSG_ONE_UNRELIABLE, gmsgSettings, NULL, pev);
 		WRITE_BYTE((int)ag_match_running.GetBool());
 		WRITE_STRING(AgGamename().c_str());
-		WRITE_BYTE((int)CVAR_GET_FLOAT("mp_timelimit"));
-		WRITE_BYTE((int)CVAR_GET_FLOAT("mp_fraglimit"));
-		WRITE_BYTE((int)CVAR_GET_FLOAT("mp_friendlyfire"));
-		WRITE_BYTE((int)CVAR_GET_FLOAT("mp_weaponstay"));
-		WRITE_STRING(CVAR_GET_STRING("sv_ag_version"));
-		WRITE_STRING(CVAR_GET_STRING("sv_ag_wallgauss"));
-		WRITE_STRING(CVAR_GET_STRING("sv_ag_headshot"));
-		WRITE_STRING(CVAR_GET_STRING("sv_ag_blastradius"));
+		WRITE_BYTE((int)timelimit.GetFloat());
+		WRITE_BYTE(fraglimit.GetInt());
+		WRITE_BYTE(friendlyfire.GetBool());
+		WRITE_BYTE(weaponstay.GetBool());
+		WRITE_STRING(ag_version.GetString());
+		WRITE_STRING(ag_wallgauss.GetString());
+		WRITE_STRING(ag_headshot.GetString());
+		WRITE_STRING(ag_blastradius.GetString());
 		WRITE_STRING(spawnSystem.c_str());
 		MESSAGE_END();
 
@@ -2841,7 +2842,7 @@ void CBasePlayer::PostThink()
 		}
 	}
 
-	if (gpGlobals->time < m_flInputFixReady && singleplayer.GetFloat() > 0.0f && m_iLoading == 0)
+	if (gpGlobals->time < m_flInputFixReady && singleplayer.GetBool() && m_iLoading == 0)
 	{
 		// HACK: Some players have an invisible menu popping up and preventing them from
 		// moving the mouse when they spawn in c1a0 for instance, so we fix it with this
@@ -3183,7 +3184,7 @@ void CBasePlayer::Spawn(void)
 	g_engfuncs.pfnSetPhysicsKeyValue(edict(), "slj", "0");
 	g_engfuncs.pfnSetPhysicsKeyValue(edict(), "hl", "1");
 	//++ BulliT
-	g_engfuncs.pfnSetPhysicsKeyValue(edict(), "bj", CVAR_GET_STRING("sv_ag_oldphysics"));
+	g_engfuncs.pfnSetPhysicsKeyValue(edict(), "bj", ag_oldphysics.GetString());
 	m_fPlayerIdCheck = gpGlobals->time + 2;
 	m_fLongjumpTimer = gpGlobals->time;
 	//-- Martin Webrant
@@ -3286,7 +3287,7 @@ void CBasePlayer::Spawn(void)
 	}
 	//-- Martin Webrant
 
-	if (singleplayer.GetFloat() > 0.0f)
+	if (singleplayer.GetBool())
 	{
 		m_flInputFixReady = gpGlobals->time + (gpGlobals->frametime * INPUT_FIX_FRAMES);
 	}
@@ -3399,7 +3400,7 @@ int CBasePlayer::Restore(CRestore &restore)
 		g_engfuncs.pfnSetPhysicsKeyValue(edict(), "slj", "0");
 	}
 
-	g_engfuncs.pfnSetPhysicsKeyValue(edict(), "bj", CVAR_GET_STRING("sv_ag_oldphysics"));
+	g_engfuncs.pfnSetPhysicsKeyValue(edict(), "bj", ag_oldphysics.GetString());
 
 	RenewItems();
 
@@ -3911,7 +3912,7 @@ void CBasePlayer::ImpulseCommands()
 //=========================================================
 void CBasePlayer::CheatImpulseCommands(int iImpulse)
 {
-	if (!AgIsLocalServer() && singleplayer.GetFloat() == 0.0f)
+	if (!AgIsLocalServer() && !singleplayer.GetBool())
 		return;
 
 #if !defined(HLDEMO_BUILD)
@@ -5415,7 +5416,7 @@ void CRevertSaved ::MessageThink(void)
 
 void CRevertSaved ::LoadThink(void)
 {
-	if (!gpGlobals->deathmatch || singleplayer.GetFloat() != 0.0f)
+	if (!gpGlobals->deathmatch || singleplayer.GetBool())
 	{
 		SERVER_COMMAND("reload\n");
 	}
@@ -6133,7 +6134,7 @@ void CBasePlayer::LimitFps()
 	if (fpsLimit < MIN_FPS_LIMIT)
 	{
 		fpsLimit = MIN_FPS_LIMIT;
-		CVAR_SET_FLOAT("ag_fps_limit", MIN_FPS_LIMIT);
+		ag_fps_limit.SetValue(MIN_FPS_LIMIT);
 	}
 
 	if (ag_fps_limit_steampipe.GetBool())

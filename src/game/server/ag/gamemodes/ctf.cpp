@@ -1098,9 +1098,9 @@ class AgCTFDetect : public CBaseEntity
 
 		if (ag_gamemode_auto.GetBool())
 		{
-			AgString sGametype = CVAR_GET_STRING("sv_ag_gametype");
+			AgString sGametype = ag_gametype.GetString();
 			if (sGametype != "ctf")
-				CVAR_SET_STRING("sv_ag_gamemode", "ctf");
+				ag_gamemode.SetValue("ctf");
 		}
 	}
 	void KeyValue(KeyValueData *pkvd)

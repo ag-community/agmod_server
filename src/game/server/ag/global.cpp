@@ -481,7 +481,6 @@ void AgInitGame()
 {
 	AgInitTimer();
 
-
 	// ## General Gameplay ##
 
 	// ## Voting ##
@@ -525,7 +524,7 @@ void AgInitGame()
 	CVar::StartRecordingChanges();
 
 	// Set up initial settings. Add "startup_" before
-	char *servercfgfile = (char *)CVAR_GET_STRING("servercfgfile");
+	char *servercfgfile = (char *)ConVarRef("servercfgfile").GetString();
 
 	if (servercfgfile && servercfgfile[0])
 	{
@@ -534,7 +533,7 @@ void AgInitGame()
 		SERVER_EXECUTE_HL();
 	}
 
-	g_bLangame = 0 < CVAR_GET_FLOAT("sv_lan");
+	g_bLangame = ConVarRef("sv_lan").GetBool();
 
 	GameMode.Init();
 	LoadGreetingMessages();
@@ -1301,7 +1300,7 @@ void AgPlayCountdown(CBasePlayer *pPlayer, int iSeconds)
 
 bool AgIsLocalServer()
 {
-	return !(IS_DEDICATED_SERVER() && 0 == CVAR_GET_FLOAT("sv_lan"));
+	return !(IS_DEDICATED_SERVER() && !ConVarRef("sv_lan").GetBool());
 }
 
 const char *AgGetGame()
@@ -1419,7 +1418,7 @@ float GetCountdownTimeOrDefault(float defaultValue)
 	else if (ag_countdown.GetInt() < MIN_COUNTDOWN_TIME)
 	{
 		countdown = MIN_COUNTDOWN_TIME;
-		CVAR_SET_FLOAT("sv_ag_countdown", MIN_COUNTDOWN_TIME);
+		ag_countdown.SetValue(MIN_COUNTDOWN_TIME);
 	}
 	else
 		countdown = ag_countdown.GetInt();

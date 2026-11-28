@@ -21,9 +21,9 @@ AgMatch::AgMatch()
 	m_fNextSay = 0.0;
 	m_fNextHLTV = 0.0;
 	m_bCountdownStarted = false;
-	CVAR_SET_FLOAT("sv_ag_match_running", 0);
-	CVAR_SET_FLOAT("ag_spectalk", 1);
-	CVAR_SET_FLOAT("sv_ag_show_gibs", 1);
+	ag_match_running.SetValue(0);
+	ag_spectalk.SetValue(1);
+	ag_show_gibs.SetValue(1);
 }
 
 AgMatch::~AgMatch()
@@ -67,7 +67,7 @@ void AgMatch::Think()
 	  AgSay(NULL,"Game is paused!\n",&m_fNextSay,5,0.4);
 	}
 	*/
-	else if (0 == timelimit.GetFloat() && 0 == fraglimit.GetFloat())
+	else if (0 == timelimit.GetFloat() && 0 == fraglimit.GetInt())
 	{
 		// Stop the match since it could go on forever.
 		Abort();
@@ -104,7 +104,7 @@ void AgMatch::Think()
 
 void AgMatch::Start(const AgString &sSpawn)
 {
-	if (m_fMatchStart > 0 || 0 == timelimit.GetFloat() && 0 == fraglimit.GetFloat())
+	if (m_fMatchStart > 0 || 0 == timelimit.GetFloat() && 0 == fraglimit.GetInt())
 		return;
 
 	std::vector<CBasePlayer *> matchPlayers;
@@ -127,9 +127,9 @@ void AgMatch::Start(const AgString &sSpawn)
 	}
 
 	// Set match flag. (All entered after matchstart will go into specmode and they cant respawn.)
-	CVAR_SET_FLOAT("sv_ag_match_running", 1);
-	CVAR_SET_FLOAT("ag_spectalk", 0);
-	CVAR_SET_FLOAT("sv_ag_show_gibs", 0);
+	ag_match_running.SetValue(1);
+	ag_spectalk.SetValue(0);
+	ag_show_gibs.SetValue(0);
 
 	// Set match start time.
 	m_fMatchStart = gpGlobals->time + GetCountdownTimeOrDefault(10.0f);
@@ -237,9 +237,9 @@ void AgMatch::MatchStart()
 void AgMatch::Abort()
 {
 	// Turn off match
-	CVAR_SET_FLOAT("sv_ag_match_running", 0);
-	CVAR_SET_FLOAT("sv_ag_show_gibs", 1);
-	CVAR_SET_FLOAT("ag_spectalk", 1);
+	ag_match_running.SetValue(0);
+	ag_show_gibs.SetValue(1);
+	ag_spectalk.SetValue(1);
 
 	m_fMatchStart = -1;
 	m_bCountdownStarted = false;

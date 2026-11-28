@@ -13,6 +13,7 @@
  *
  ****/
 #include "extdll.h"
+#include "convar.h"
 #include "util.h"
 #include "cbase.h"
 #include "monsters.h"
@@ -1388,7 +1389,7 @@ void CGibShooter::Spawn(void)
 
 CGib *CGibShooter ::CreateGib(void)
 {
-	if (CVAR_GET_FLOAT("violence_hgibs") == 0)
+	if (!ConVarRef("violence_hgibs").GetBool())
 		return NULL;
 
 	CGib *pGib = GetClassPtr((CGib *)NULL);

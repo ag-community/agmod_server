@@ -18,6 +18,7 @@
 #include <vector>
 
 #include "extdll.h"
+#include "convar.h"
 #include "util.h"
 #include "cbase.h"
 #include "player.h"
@@ -100,7 +101,7 @@ CHalfLifeMultiplay ::CHalfLifeMultiplay()
 	//++ BulliT
 	if (IS_DEDICATED_SERVER())
 	{
-		char *servercfgfile = (char *)CVAR_GET_STRING("servercfgfile");
+		char *servercfgfile = (char *)ConVarRef("servercfgfile").GetString();
 		if (servercfgfile && servercfgfile[0])
 		{
 			ALERT(at_console, "Executing dedicated server config file\n");
@@ -110,7 +111,7 @@ CHalfLifeMultiplay ::CHalfLifeMultiplay()
 	}
 	else
 	{
-		char *lservercfgfile = (char *)CVAR_GET_STRING("lservercfgfile");
+		char *lservercfgfile = (char *)ConVarRef("lservercfgfile").GetString();
 		if (lservercfgfile && lservercfgfile[0])
 		{
 			ALERT(at_console, "Executing listen server config file\n");
@@ -291,7 +292,7 @@ void CHalfLifeMultiplay ::Think(void)
 			time_remaining = 0;
 		}
 	}
-	float flFragLimit = fraglimit.GetFloat();
+	float flFragLimit = fraglimit.GetInt();
 	//-- Martin Webrant
 
 	if (flFragLimit)
@@ -1294,19 +1295,19 @@ void CHalfLifeMultiplay ::GoToIntermission(void)
 
 void CHalfLifeMultiplay::ClampIntermissionTime()
 {
-	const auto time = CVAR_GET_FLOAT("mp_chattime");
-	const auto maxTime = CVAR_GET_FLOAT("mp_intermission_time");
+	const auto time = mp_chattime.GetFloat();
+	const auto maxTime = mp_intermission_time.GetFloat();
 
 	// Bounds checks
 	if (maxTime > MAX_INTERMISSION_TIME)
-		CVAR_SET_FLOAT("mp_intermission_time", MAX_INTERMISSION_TIME);
+		mp_intermission_time.SetValue(MAX_INTERMISSION_TIME);
 	else if (maxTime < MIN_INTERMISSION_TIME)
-		CVAR_SET_FLOAT("mp_intermission_time", MIN_INTERMISSION_TIME);
+		mp_intermission_time.SetValue(MIN_INTERMISSION_TIME);
 
 	if (time > mp_intermission_time.GetInt())
-		CVAR_SET_FLOAT("mp_chattime", mp_intermission_time.GetInt());
+		mp_chattime.SetValue(mp_intermission_time.GetInt());
 	else if (time < MIN_INTERMISSION_TIME)
-		CVAR_SET_FLOAT("mp_chattime", MIN_INTERMISSION_TIME);
+		mp_chattime.SetValue(MIN_INTERMISSION_TIME);
 }
 
 #define MAX_RULE_BUFFER 1024
@@ -1683,7 +1684,7 @@ void CHalfLifeMultiplay ::ChangeLevel(void)
 	bool do_cycle = true;
 
 	// find the map to change to
-	char *mapcfile = (char *)CVAR_GET_STRING("mapcyclefile");
+	char *mapcfile = (char *)ConVarRef("mapcyclefile").GetString();
 	ASSERT(mapcfile != NULL);
 
 	szCommands[0] = '\0';
@@ -1802,11 +1803,11 @@ void CHalfLifeMultiplay ::SendMOTDToClient(edict_t *client)
 	// read from the MOTD.txt file
 	int length, char_count = 0;
 	char *pFileList;
-	char *aFileList = pFileList = (char *)LOAD_FILE_FOR_ME((char *)CVAR_GET_STRING("motdfile"), &length);
+	char *aFileList = pFileList = (char *)LOAD_FILE_FOR_ME((char *)ConVarRef("motdfile").GetString(), &length);
 
 	// send the server name
 	MESSAGE_BEGIN(MSG_ONE, gmsgServerName, NULL, client);
-	WRITE_STRING(CVAR_GET_STRING("hostname"));
+	WRITE_STRING(ConVarRef("hostname").GetString());
 	MESSAGE_END();
 
 	// Send the message of the day

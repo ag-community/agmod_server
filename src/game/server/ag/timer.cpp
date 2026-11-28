@@ -22,7 +22,6 @@ AgTimer::AgTimer()
 	m_fNextTimerUpdate = gpGlobals->time + 5.0; // Dont start timer directly.
 	m_fLastTimeCheck = gpGlobals->time;
 	m_fEffectiveTime = 0.0;
-	m_pmp_timelimit = CVAR_GET_POINTER("mp_timelimit");
 }
 
 AgTimer::~AgTimer()
@@ -41,11 +40,11 @@ void AgTimer::Think()
 	{
 		// Sanity time check. Some dudes tends to put timelimit weird.
 		if (timelimit.GetFloat() > 2880)
-			CVAR_SET_FLOAT("mp_timelimit", 2880); // Max two days.
+			timelimit.SetValue(2880); // Max two days.
 
 		// Write the time. (negative turns off timer on client)
 		MESSAGE_BEGIN(MSG_BROADCAST, gmsgTimer);
-		WRITE_LONG((int)m_pmp_timelimit->value * 60); // Timelimit
+		WRITE_LONG((int)timelimit.GetFloat() * 60); // Timelimit
 		WRITE_LONG((int)m_fEffectiveTime); // How much time that has passed.
 		MESSAGE_END();
 		// Send next in 1 sec

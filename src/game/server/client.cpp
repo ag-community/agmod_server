@@ -136,7 +136,7 @@ void ClientDisconnect(edict_t *pEntity)
 // called by ClientKill and DeadThink
 void respawn(entvars_t *pev, bool fCopyCorpse)
 {
-	if ((gpGlobals->coop || gpGlobals->deathmatch) && singleplayer.GetFloat() == 0.0f)
+	if ((gpGlobals->coop || gpGlobals->deathmatch) && !singleplayer.GetBool())
 	{
 		//++ BulliT
 		if (fCopyCorpse && pev->movetype != MOVETYPE_NOCLIP && ag_show_gibs.GetBool())
@@ -689,7 +689,7 @@ void ServerActivate(edict_t *pEdictList, int edictCount, int clientMax)
 	// Every call to ServerActivate should be matched by a call to ServerDeactivate
 	g_serveractive = 1;
 
-	if (singleplayer.GetFloat() != 0.0f)
+	if (singleplayer.GetBool())
 	{
 		if (g_isRestoring)
 		{
@@ -951,7 +951,7 @@ void PlayerCustomization(edict_t *pEntity, customization_t *pCust)
 	entvars_t *pev = &pEntity->v;
 	CBasePlayer *pPlayer = (CBasePlayer *)GET_PRIVATE(pEntity);
 
-	if (singleplayer.GetFloat() > 0.0f)
+	if (singleplayer.GetBool())
 	{
 		// HACK: This is called on map start, on saveload and changelevel, when the load frames
 		// are about to finish, so it's a good place to fix mouse input, just keep trying
@@ -1922,7 +1922,7 @@ int ConnectionlessPacket(const struct netadr_s *net_from, const char *args, char
 		}
 		else if (0 == strncmp("agsay", args, 5))
 		{
-			if (CVAR_GET_FLOAT("mm_agsay"))
+			if (mm_agsay.GetBool())
 			{
 				float fHoldTime = 4;
 				const char *pszMessage = UTIL_SplitTextMessage(&args[5]);
@@ -2004,7 +2004,7 @@ One of the ENGINE_FORCE_UNMODIFIED files failed the consistency check for the sp
 int InconsistentFile(const edict_t *player, const char *filename, char *disconnect_message)
 {
 	// Server doesn't care?
-	if (CVAR_GET_FLOAT("mp_consistency") != 1)
+	if (!ConVarRef("mp_consistency").GetBool())
 		return 0;
 
 	// Default behavior is to kick the player

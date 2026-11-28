@@ -24,11 +24,16 @@ typedef std::set<AgString, std::less<AgString>> AgStringSet;
 #define ADD_SERVER_COMMAND (*g_engfuncs.pfnAddServerCommand)
 extern DLL_GLOBAL bool g_fGameOver;
 
+extern AgConVar ag_version;
+extern AgConVar ag_gametype;
+extern AgConVar ag_oldphysics;
+
 extern AgConVar fraglimit;
 extern AgConVar timelimit;
 
 extern AgConVar ag_gamemode;
 extern AgConVar ag_gamemode_auto;
+extern AgConVar ag_allowed_gamemodes;
 
 extern AgConVar ag_spectalk;
 extern AgConVar ag_max_spectators;
@@ -40,6 +45,7 @@ extern AgConVar ag_match_running;
 extern AgConVar ag_player_id;
 extern AgConVar ag_lj_timer;
 extern AgConVar ag_auto_admin;
+extern AgConVar mm_agsay;
 
 extern AgConVar ag_wallgauss;
 extern AgConVar ag_headshot;

@@ -74,9 +74,9 @@ bool AgSettings::Think()
 	m_fNextCheck = gpGlobals->time + 5.0; // Every 5 seconds.
 
 	// Check if to display next map.
-	if (m_bCheckNextMap && timelimit.GetFloat() || m_bCheckNextMap && fraglimit.GetFloat())
+	if (m_bCheckNextMap && timelimit.GetFloat() || m_bCheckNextMap && fraglimit.GetInt())
 	{
-		if (timeleft.GetFloat() && 60 > timeleft.GetFloat() || fraglimit.GetFloat() && 2 > fragsleft.GetInt())
+		if (timeleft.GetFloat() && 60 > timeleft.GetFloat() || fraglimit.GetInt() && 2 > fragsleft.GetInt())
 		{
 			MESSAGE_BEGIN(MSG_BROADCAST, gmsgNextmap);
 			WRITE_STRING(GetNextLevel().c_str());
@@ -93,7 +93,7 @@ bool AgSettings::AdminSetting(const AgString &sSetting, const AgString &sValue)
 {
 	if (CVar::IsTracked(sSetting))
 	{
-		CVAR_SET_STRING(sSetting.c_str(), sValue.c_str());
+		ConVarRef(sSetting.c_str()).SetValue(sValue.c_str());
 		return true;
 	}
 	return false;
@@ -160,7 +160,7 @@ void AgSettings::CalcNextMap()
   typedef std::list<AgString> AgMapList;
   AgMapList lstMaps;
 
-  char *pszMapFile = (char*) CVAR_GET_STRING( "mapcyclefile" );
+  char *pszMapFile = (char*) ConVarRef("mapcyclefile").GetString();
   ASSERT( pszMapFile != NULL );
 
   // Load the file
@@ -621,7 +621,7 @@ void AgSettings::CalcNextMap()
 	bool do_cycle = true;
 
 	// find the map to change to
-	char *mapcfile = (char *)CVAR_GET_STRING("mapcyclefile");
+	char *mapcfile = (char *)ConVarRef("mapcyclefile").GetString();
 	ASSERT(mapcfile != NULL);
 
 	szCommands[0] = '\0';

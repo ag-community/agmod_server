@@ -17,6 +17,7 @@
 //=========================================================
 
 #include "extdll.h"
+#include "convar.h"
 #include "util.h"
 #include "cbase.h"
 #include "weapons.h"
@@ -1448,7 +1449,7 @@ void EMIT_SOUND_SUIT(edict_t *entity, const char *sample)
 	float fvol;
 	int pitch = PITCH_NORM;
 
-	fvol = CVAR_GET_FLOAT("suitvolume");
+	fvol = ConVarRef("suitvolume").GetFloat();
 	if (RANDOM_LONG(0, 1))
 		pitch = RANDOM_LONG(0, 6) + 98;
 
@@ -1463,7 +1464,7 @@ void EMIT_GROUPID_SUIT(edict_t *entity, int isentenceg)
 	float fvol;
 	int pitch = PITCH_NORM;
 
-	fvol = CVAR_GET_FLOAT("suitvolume");
+	fvol = ConVarRef("suitvolume").GetFloat();
 	if (RANDOM_LONG(0, 1))
 		pitch = RANDOM_LONG(0, 6) + 98;
 
@@ -1478,7 +1479,7 @@ void EMIT_GROUPNAME_SUIT(edict_t *entity, const char *groupname)
 	float fvol;
 	int pitch = PITCH_NORM;
 
-	fvol = CVAR_GET_FLOAT("suitvolume");
+	fvol = ConVarRef("suitvolume").GetFloat();
 	if (RANDOM_LONG(0, 1))
 		pitch = RANDOM_LONG(0, 6) + 98;
 

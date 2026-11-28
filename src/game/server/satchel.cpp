@@ -15,6 +15,7 @@
 #if !defined(OEM_BUILD) && !defined(HLDEMO_BUILD)
 
 #include "extdll.h"
+#include "convar.h"
 #include "util.h"
 #include "cbase.h"
 #include "monsters.h"
@@ -22,6 +23,7 @@
 #include "nodes.h"
 #include "player.h"
 #include "gamerules.h"
+#include "game.h"
 
 enum satchel_e
 {
@@ -115,7 +117,7 @@ void CSatchelCharge ::Spawn(void)
 		{
 			// Minimum 1 hp, because i'm not sure if stuff gets broken on 0 hp or less
 			// and how the rounding works on health, or if it gets rounded at all for non-player entities
-			CVAR_SET_FLOAT("sv_ag_satchel_health", 1.0f);
+			ag_satchel_health.SetValue(1);
 		}
 
 		pev->health = ag_satchel_health.GetInt();
@@ -410,7 +412,7 @@ bool CSatchel::Deploy()
 	else
 		result = DefaultDeploy("models/v_satchel.mdl", "models/p_satchel.mdl", SATCHEL_DRAW, "trip");
 
-	if (CVAR_GET_FLOAT("sv_singleplayer") > 0.0f)
+	if (singleplayer.GetBool())
 		m_pPlayer->m_flNextAttack = UTIL_WeaponTimeBase() + 0.3;
 
 	return result;
@@ -418,7 +420,7 @@ bool CSatchel::Deploy()
 
 void CSatchel::Holster(int skiplocal /* = 0 */)
 {
-	if (CVAR_GET_FLOAT("sv_singleplayer") > 0.0f)
+	if (singleplayer.GetBool())
 		m_pPlayer->m_flNextAttack = UTIL_WeaponTimeBase() + 0.2;
 	else
 		m_pPlayer->m_flNextAttack = UTIL_WeaponTimeBase() + 0.5;

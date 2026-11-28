@@ -14,6 +14,7 @@
  ****/
 
 #include "extdll.h"
+#include "convar.h"
 #include "util.h"
 #include "cbase.h"
 #include "monsters.h"
@@ -21,6 +22,7 @@
 #include "nodes.h"
 #include "player.h"
 #include "gamerules.h"
+#include "game.h"
 //++ BulliT
 #ifdef AGSTATS
 #include "ag/statistics.h"
@@ -193,7 +195,7 @@ int CCrowbar::Swing(int fFirst)
 				FindHullIntersection(vecSrc, tr, VEC_DUCK_HULL_MIN, VEC_DUCK_HULL_MAX, m_pPlayer->edict());
 			vecEnd = tr.vecEndPos; // This is the point on the actual surface (the hull could have hit space)
 		}
-		else if (CVAR_GET_FLOAT("sv_singleplayer") > 0.0f)
+		else if (singleplayer.GetBool())
 		{
 			// Try with a larger hull
 			UTIL_TraceHull(vecSrc, vecEnd, dont_ignore_monsters, large_hull, ENT(m_pPlayer->pev), &tr);
@@ -216,7 +218,7 @@ int CCrowbar::Swing(int fFirst)
 		if (fFirst)
 		{
 			// miss
-			if (CVAR_GET_FLOAT("sv_singleplayer") > 0.0f)
+			if (singleplayer.GetBool())
 				m_flNextPrimaryAttack = GetNextAttackDelay(0.3);
 			else
 				m_flNextPrimaryAttack = GetNextAttackDelay(0.5);

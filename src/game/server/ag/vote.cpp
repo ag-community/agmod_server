@@ -4,6 +4,7 @@
 #include "util.h"
 #include "cbase.h"
 #include "player.h"
+#include "game.h"
 #include "ag/global.h"
 #include "ag/vote.h"
 #include "ag/command.h"
@@ -339,7 +340,7 @@ bool AgVote::HandleCommand(CBasePlayer *pPlayer)
 				}
 
 				// Don't allow extending the timelimit too quickly... maybe someone wanted to add days of timelimit by spamming this
-				auto remainingMinutes = CVAR_GET_FLOAT("mp_timeleft") / 60.0f;
+				auto remainingMinutes = timeleft.GetFloat() / 60.0f;
 				auto cooldown = remainingMinutes - (ag_vote_extra_timelimit.GetInt() / 2.0f);
 				if (cooldown > 0.0f)
 				{
@@ -496,7 +497,7 @@ bool AgVote::HandleCommand(CBasePlayer *pPlayer)
 
 				if (m_sValue.empty())
 				{
-					AgConsole(UTIL_VarArgs("%s is \"%s\"", m_sVote.c_str(), CVAR_GET_STRING(m_sVote.c_str())), pPlayer);
+					AgConsole(UTIL_VarArgs("%s is \"%s\"", m_sVote.c_str(), ConVarRef(m_sVote.c_str()).GetString()), pPlayer);
 					return true;
 				}
 

@@ -21,6 +21,7 @@
 */
 
 #include "extdll.h"
+#include "convar.h"
 #include "util.h"
 #include "cbase.h"
 #include "saverestore.h"
@@ -1109,12 +1110,12 @@ bool UTIL_ShouldShowBlood(int color)
 	{
 		if (color == BLOOD_COLOR_RED)
 		{
-			if (CVAR_GET_FLOAT("violence_hblood") != 0)
+			if (ConVarRef("violence_hblood").GetBool())
 				return true;
 		}
 		else
 		{
-			if (CVAR_GET_FLOAT("violence_ablood") != 0)
+			if (ConVarRef("violence_ablood").GetBool())
 				return true;
 		}
 	}

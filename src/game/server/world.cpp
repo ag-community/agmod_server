@@ -22,6 +22,7 @@
 
 #include "extdll.h"
 #include "util.h"
+#include "game.h"
 #include "cbase.h"
 #include "nodes.h"
 #include "soundent.h"
@@ -116,7 +117,7 @@ LINK_ENTITY_TO_CLASS(infodecal, CDecal);
 // UNDONE:  These won't get sent to joining players in multi-player
 void CDecal ::Spawn(void)
 {
-	if (pev->skin < 0 || ((gpGlobals->deathmatch && CVAR_GET_FLOAT("sv_singleplayer") == 0.0f) && FBitSet(pev->spawnflags, SF_DECAL_NOTINDEATHMATCH)))
+	if (pev->skin < 0 || ((gpGlobals->deathmatch && !singleplayer.GetBool()) && FBitSet(pev->spawnflags, SF_DECAL_NOTINDEATHMATCH)))
 	{
 		REMOVE_ENTITY(ENT(pev));
 		return;
@@ -466,14 +467,14 @@ void CWorld ::Precache(void)
 	g_spawnHistory.clear();
 
 #if 1
-	CVAR_SET_STRING("sv_gravity", "800"); // 67ft/sec
-	CVAR_SET_STRING("sv_stepsize", "18");
+	ConVarRef("sv_gravity").SetValue(800.0f); // 67ft/sec
+	ConVarRef("sv_stepsize").SetValue(18.0f);
 #else
-	CVAR_SET_STRING("sv_gravity", "384"); // 32ft/sec
-	CVAR_SET_STRING("sv_stepsize", "24");
+	ConVarRef("sv_gravity").SetValue(384.0f); // 32ft/sec
+	ConVarRef("sv_stepsize").SetValue(24.0f);
 #endif
 
-	CVAR_SET_STRING("room_type", "0"); // clear DSP
+	ConVarRef("room_type").SetValue(0); // clear DSP
 
 	// Set up game rules
 	if (g_pGameRules)
@@ -522,7 +523,7 @@ void CWorld ::Precache(void)
 	PRECACHE_SOUND("common/bodydrop3.wav"); // dead bodies hitting the ground (animation events)
 	PRECACHE_SOUND("common/bodydrop4.wav");
 
-	g_Language = (int)CVAR_GET_FLOAT("sv_language");
+	g_Language = ConVarRef("sv_language").GetInt();
 	if (g_Language == LANGUAGE_GERMAN)
 	{
 		PRECACHE_MODEL("models/germangibs.mdl");
@@ -614,9 +615,9 @@ void CWorld ::Precache(void)
 
 	// TODO: move this to before InstallGameRules()?
 	if (pev->speed > 0)
-		CVAR_SET_FLOAT("sv_zmax", pev->speed);
+		ConVarRef("sv_zmax").SetValue(pev->speed);
 	else
-		CVAR_SET_FLOAT("sv_zmax", 4096);
+		ConVarRef("sv_zmax").SetValue(4096.0f);
 
 	if (pev->netname)
 	{
@@ -634,9 +635,9 @@ void CWorld ::Precache(void)
 
 	// TODO: move this to before InstallGameRules()?
 	if (pev->spawnflags & SF_WORLD_DARK)
-		CVAR_SET_FLOAT("v_dark", 1.0);
+		ConVarRef("v_dark").SetValue(1.0f);
 	else
-		CVAR_SET_FLOAT("v_dark", 0.0);
+		ConVarRef("v_dark").SetValue(0.0f);
 
 	if (pev->spawnflags & SF_WORLD_TITLE)
 		gDisplayTitle = true; // display the game title if this key is set
@@ -646,11 +647,11 @@ void CWorld ::Precache(void)
 	// TODO: move this to before InstallGameRules()?
 	if (pev->spawnflags & SF_WORLD_FORCETEAM)
 	{
-		CVAR_SET_FLOAT("mp_defaultteam", 1);
+		defaultteam.SetValue(1);
 	}
 	else
 	{
-		CVAR_SET_FLOAT("mp_defaultteam", 0);
+		defaultteam.SetValue(0);
 	}
 }
 
@@ -662,7 +663,7 @@ void CWorld ::KeyValue(KeyValueData *pkvd)
 	if (FStrEq(pkvd->szKeyName, "skyname"))
 	{
 		// Sent over net now.
-		CVAR_SET_STRING("sv_skyname", pkvd->szValue);
+		ConVarRef("sv_skyname").SetValue(pkvd->szValue);
 		pkvd->fHandled = true;
 	}
 	else if (FStrEq(pkvd->szKeyName, "sounds"))
@@ -675,7 +676,7 @@ void CWorld ::KeyValue(KeyValueData *pkvd)
 		// Sent over net now.
 		pev->scale = atof(pkvd->szValue) * (1.0 / 8.0);
 		pkvd->fHandled = true;
-		CVAR_SET_FLOAT("sv_wateramp", pev->scale);
+		ConVarRef("sv_wateramp").SetValue(pev->scale);
 	}
 	else if (FStrEq(pkvd->szKeyName, "MaxRange"))
 	{
@@ -700,7 +701,7 @@ void CWorld ::KeyValue(KeyValueData *pkvd)
 	{
 		// Single player only.  Clear save directory if set
 		if (atoi(pkvd->szValue))
-			CVAR_SET_FLOAT("sv_newunit", 1);
+			ConVarRef("sv_newunit").SetValue(1);
 		pkvd->fHandled = true;
 	}
 	else if (FStrEq(pkvd->szKeyName, "gametitle"))

@@ -21,6 +21,7 @@
 */
 
 #include "extdll.h"
+#include "convar.h"
 #include "util.h"
 #include "cbase.h"
 #include "doors.h"
@@ -251,7 +252,7 @@ LINK_ENTITY_TO_CLASS(func_monsterclip, CFuncMonsterClip);
 void CFuncMonsterClip::Spawn(void)
 {
 	CFuncWall::Spawn();
-	if (CVAR_GET_FLOAT("showtriggers") == 0)
+	if (!ConVarRef("showtriggers").GetBool())
 		pev->effects = EF_NODRAW;
 	pev->flags |= FL_MONSTERCLIP;
 }

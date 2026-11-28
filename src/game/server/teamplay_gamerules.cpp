@@ -16,6 +16,7 @@
 // teamplay_gamerules.cpp
 //
 #include "extdll.h"
+#include "convar.h"
 #include "util.h"
 #include "cbase.h"
 #include "player.h"
@@ -107,7 +108,7 @@ void CHalfLifeTeamplay ::Think(void)
 
 	//++ BulliT
 	/*
-	  float flTimeLimit = CVAR_GET_FLOAT("mp_timelimit") * 60;
+	  float flTimeLimit = timelimit.GetFloat() * 60;
 
 	  time_remaining = (int)(flTimeLimit ? ( flTimeLimit - gpGlobals->time ) : 0);
 
@@ -150,7 +151,7 @@ void CHalfLifeTeamplay ::Think(void)
 	//-- muphicks
 	//-- Martin Webrant
 
-	float flFragLimit = fraglimit.GetFloat();
+	float flFragLimit = fraglimit.GetInt();
 	if (flFragLimit)
 	{
 		int bestfrags = 9999;

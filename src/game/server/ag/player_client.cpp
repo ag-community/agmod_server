@@ -323,7 +323,7 @@ bool AgClient::HandleCommand(CBasePlayer *pPlayer)
 	}
 	else if (FStrEq(CMD_ARGV(0), "stats_run"))
 	{
-		if (singleplayer.GetFloat() > 0.0f && g_bLangame)
+		if (singleplayer.GetBool() && g_bLangame)
 		{
 			SpeedrunStats::PrintRun();
 			return true;
@@ -332,7 +332,7 @@ bool AgClient::HandleCommand(CBasePlayer *pPlayer)
 	}
 	else if (FStrEq(CMD_ARGV(0), "stats_session"))
 	{
-		if (singleplayer.GetFloat() > 0.0f && g_bLangame)
+		if (singleplayer.GetBool() && g_bLangame)
 		{
 			SpeedrunStats::PrintSession();
 			return true;
@@ -341,7 +341,7 @@ bool AgClient::HandleCommand(CBasePlayer *pPlayer)
 	}
 	else if (FStrEq(CMD_ARGV(0), "delay_changelevel"))
 	{
-		if (singleplayer.GetFloat() > 0.0f && g_bLangame)
+		if (singleplayer.GetBool() && g_bLangame)
 		{
 			if (g_bPostponeChangelevel && g_pLastChangelevel)
 				g_pLastChangelevel->DoChangeLevel();

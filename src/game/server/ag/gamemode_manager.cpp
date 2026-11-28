@@ -25,7 +25,7 @@ static constexpr float STANDARD_FPS_VALUES[] = { 30.0, 60.0, 72.0, 100.0, 125.0,
 
 void SetupGametype()
 {
-	AgString sGametype = CVAR_GET_STRING("sv_ag_gametype");
+	AgString sGametype = ag_gametype.GetString();
 	g_GameType = STANDARD;
 	if (sGametype == "arena")
 		g_GameType = ARENA;
@@ -168,13 +168,13 @@ void AgGamemodeManager::Help(CBasePlayer *pPlayer)
 
 void AgGamemodeManager::Think()
 {
-	if (m_fNextCheck <= gpGlobals->time && g_sGamemode != CVAR_GET_STRING("sv_ag_gamemode"))
+	if (m_fNextCheck <= gpGlobals->time && g_sGamemode != ag_gamemode.GetString())
 	{
 		// Gamemode has changed. Save the new one and changelevel. The new settings will be set just before allocating the new gamerules.
-		g_sGamemode = CVAR_GET_STRING("sv_ag_gamemode");
-		CVAR_SET_FLOAT("sv_ag_match_running", 0);
-		CVAR_SET_FLOAT("ag_spectalk", 1);
-		CVAR_SET_FLOAT("sv_ag_show_gibs", 1);
+		g_sGamemode = ag_gamemode.GetString();
+		ag_match_running.SetValue(0);
+		ag_spectalk.SetValue(1);
+		ag_show_gibs.SetValue(1);
 		g_pGameRules->m_Settings.Changelevel(STRING(gpGlobals->mapname));
 
 		m_fNextCheck = gpGlobals->time + 1; // Check every second.
@@ -224,7 +224,7 @@ void AgGamemodeManager::Think()
 		}
 
 		if (ag_fps_limit_check_interval.GetFloat() < MIN_FPS_LIMIT_CHECK_INTERVAL)
-			CVAR_SET_FLOAT("ag_fps_limit_check_interval", MIN_FPS_LIMIT_CHECK_INTERVAL);
+			ag_fps_limit_check_interval.SetValue(MIN_FPS_LIMIT_CHECK_INTERVAL);
 
 		m_fNextFpsLimitCheck = gpGlobals->time + ag_fps_limit_check_interval.GetFloat();
 
@@ -241,7 +241,7 @@ void AgGamemodeManager::Think()
 		if (ag_fps_limit.GetInt() == newFpsLimit)
 			return;
 
-		CVAR_SET_FLOAT("ag_fps_limit", newFpsLimit);
+		ag_fps_limit.SetValue(newFpsLimit);
 
 		// Enforce the limitation here, because it's just easier than doing it in player's
 		// PostThink(), with all the things it involves (more checks, avoid race conditions, etc.)
@@ -285,7 +285,7 @@ void AgGamemodeManager::Gamemode(const AgString &sGamemode, CBasePlayer *pPlayer
 {
 	if ((IsGamemode(sGamemode) && !pPlayer) || IsAllowedGamemode(sGamemode, pPlayer))
 	{
-		CVAR_SET_STRING("sv_ag_gamemode", sGamemode.c_str());
+		ag_gamemode.SetValue(sGamemode.c_str());
 		AgConsole("Gamemode changed.", pPlayer);
 		g_sNextmode = "";
 	}
@@ -316,11 +316,11 @@ void AgGamemodeManager::ExecConfig()
 
 	if (g_sNextmode.size())
 	{
-		CVAR_SET_STRING("sv_ag_gamemode", g_sNextmode.c_str());
+		ag_gamemode.SetValue(g_sNextmode.c_str());
 		g_sNextmode = "";
 	}
 
-	AgGamemodeConfigMap::iterator itrGames = m_mapGames.find(CVAR_GET_STRING("sv_ag_gamemode"));
+	AgGamemodeConfigMap::iterator itrGames = m_mapGames.find(ag_gamemode.GetString());
 	if (itrGames == m_mapGames.end())
 	{
 		// eh? - error in config.
@@ -343,7 +343,7 @@ void AgGamemodeManager::ExecConfig()
 		CVar::StopRecordingGamemodeChanges();
 
 		// So that map does not restart directly.
-		g_sGamemode = CVAR_GET_STRING("sv_ag_gamemode");
+		g_sGamemode = ag_gamemode.GetString();
 
 		// Setup the gametype.
 		SetupGametype();
@@ -400,17 +400,17 @@ bool AgGamemodeManager::IsAllowedGamemode(const AgString &sGamemode, CBasePlayer
 		return false;
 
 	// If empty we allow all.
-	if (0 == strlen(CVAR_GET_STRING("sv_ag_allowed_gamemodes")))
+	if (0 == strlen(ag_allowed_gamemodes.GetString()))
 		return true;
 
 	// Check what gamemodes that are allowed.
-	return (NULL != strstr(CVAR_GET_STRING("sv_ag_allowed_gamemodes"), sGamemode.c_str()));
+	return (NULL != strstr(ag_allowed_gamemodes.GetString(), sGamemode.c_str()));
 }
 
 void AgGamemodeManager::Init()
 {
 	// Set this initially, so server dont restart map right away.
-	g_sGamemode = CVAR_GET_STRING("sv_ag_gamemode");
+	g_sGamemode = ag_gamemode.GetString();
 
 	LoadGames();
 

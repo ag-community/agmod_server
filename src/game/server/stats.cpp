@@ -6,6 +6,7 @@
 //=============================================================================
 
 #include "extdll.h"
+#include "convar.h"
 #include "util.h"
 
 #include "cbase.h"
@@ -137,7 +138,7 @@ void UpdateStats(CBasePlayer *pPlayer)
 	}
 	else if ((gStats.nextOutputTime != 0 && gStats.nextOutputTime < gStats.gameTime) || forceWrite)
 	{
-		UpdateStatsFile(gStats.dataTime, (char *)STRING(gpGlobals->mapname), health, ammo, (int)CVAR_GET_FLOAT("skill"));
+		UpdateStatsFile(gStats.dataTime, (char *)STRING(gpGlobals->mapname), health, ammo, ConVarRef("skill").GetInt());
 
 		gStats.lastAmmo = ammo;
 		gStats.lastHealth = health;

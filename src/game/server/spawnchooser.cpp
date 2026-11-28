@@ -106,7 +106,7 @@ CBaseEntity *CSpawnChooser::GetClassicSpawnPoint()
 	if (FNullEnt(pSpot)) // skip over the null point
 		pSpot = UTIL_FindEntityByClassname(pSpot, "info_player_deathmatch");
 
-	if (FNullEnt(pSpot) && singleplayer.GetFloat())
+	if (FNullEnt(pSpot) && singleplayer.GetBool())
 		pSpot = UTIL_FindEntityByClassname(pSpot, "info_player_start");
 
 	CBaseEntity *pFirstSpot = pSpot;
@@ -171,7 +171,7 @@ CBaseEntity *CSpawnChooser::GetHL25SpawnPoint()
 	if (FNullEnt(pSpot)) // skip over the null point
 		pSpot = UTIL_FindEntityByClassname(pSpot, "info_player_deathmatch");
 
-	if (FNullEnt(pSpot) && singleplayer.GetFloat())
+	if (FNullEnt(pSpot) && singleplayer.GetBool())
 		pSpot = UTIL_FindEntityByClassname(pSpot, "info_player_start");
 
 	CBaseEntity *pFirstSpot = pSpot;

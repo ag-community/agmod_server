@@ -2,12 +2,13 @@
 
 #pragma once
 
+#include "game.h"
+
 class AgTimer
 {
 	float m_fNextTimerUpdate;
 	float m_fLastTimeCheck;
 	float m_fEffectiveTime;
-	cvar_t *m_pmp_timelimit;
 
 public:
 	AgTimer();
@@ -22,7 +23,7 @@ public:
 
 inline bool AgTimer::TimeRemaining(int &iTimeRemaining)
 {
-	float fTimeLimit = m_pmp_timelimit->value * 60;
+	float fTimeLimit = timelimit.GetFloat() * 60;
 	iTimeRemaining = (int)(fTimeLimit ? (fTimeLimit - m_fEffectiveTime) : 0);
 	if (fTimeLimit != 0 && m_fEffectiveTime >= fTimeLimit)
 		return false;

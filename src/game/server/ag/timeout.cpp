@@ -81,8 +81,8 @@ void AgTimeout::Think()
 	// Check pause
 	if (m_fDisablePause != 0.0 && m_fDisablePause < AgTime())
 	{
-		if (0 < CVAR_GET_FLOAT("pausable"))
-			CVAR_SET_STRING("pausable", "0");
+		if (ConVarRef("pausable").GetBool())
+			ConVarRef("pausable").SetValue(0);
 		m_fDisablePause = 0.0;
 
 		if (DisablePause == m_State)
@@ -103,7 +103,7 @@ void AgTimeout::TogglePause(enumState State)
 		CBasePlayer *pPlayerLoop = AgPlayerByIndex(i);
 		if (pPlayerLoop && pPlayerLoop->IsPlayer())
 		{
-			CVAR_SET_STRING("pausable", "1");
+			ConVarRef("pausable").SetValue(1);
 			CLIENT_COMMAND(pPlayerLoop->edict(), "pause\n"); // This will not trigg directly so we have to wait a second to release the pauseable.
 			m_fDisablePause = AgTime() + 3; // Let client have 2 second of pauseable 1 state.
 			m_State = State;

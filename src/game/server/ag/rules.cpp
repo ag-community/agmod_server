@@ -37,8 +37,8 @@ AgGameRules::AgGameRules()
 {
 	g_bPaused = false;
 	m_bProxyConnected = false;
-	g_bUseTeamColors = CVAR_GET_FLOAT("mp_teamplay") > 0;
-	m_sHostname = CVAR_GET_STRING("hostname");
+	g_bUseTeamColors = teamplay.GetBool();
+	m_sHostname = ConVarRef("hostname").GetString();
 	AdminCache.Load();
 
 #ifdef AGSTATS
@@ -947,12 +947,12 @@ void AgGameRules::GoToIntermission()
 	if (ARENA != AgGametype() && LMS != AgGametype())
 	{
 		m_ScoreLog.End();
-		CVAR_SET_FLOAT("sv_ag_match_running", 0);
-		CVAR_SET_FLOAT("sv_ag_show_gibs", 1);
-		CVAR_SET_FLOAT("ag_spectalk", 1);
+		ag_match_running.SetValue(0);
+		ag_show_gibs.SetValue(1);
+		ag_spectalk.SetValue(1);
 	}
 
-	if (ag_speedrun.GetBool() && g_flSpeedrunStartTime > 0.0f && fraglimit.GetFloat() != 0.0f)
+	if (ag_speedrun.GetBool() && g_flSpeedrunStartTime > 0.0f && fraglimit.GetInt() != 0)
 	{
 		const auto runTime = gpGlobals->time - g_flSpeedrunStartTime;
 

@@ -13,7 +13,9 @@
  *
  ****/
 #include "extdll.h"
+#include "convar.h"
 #include "util.h"
+#include "game.h"
 #include "cbase.h"
 #include "monsters.h"
 #include "soundent.h"
@@ -254,7 +256,7 @@ void CSoundEnt ::Initialize(void)
 		pSoundEnt->m_SoundPool[iSound].m_flExpireTime = SOUND_NEVER_EXPIRE;
 	}
 
-	if (CVAR_GET_FLOAT("displaysoundlist") == 1)
+	if (displaysoundlist.GetBool())
 	{
 		m_fShowReport = true;
 	}
