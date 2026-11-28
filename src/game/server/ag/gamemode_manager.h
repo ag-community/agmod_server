@@ -1,23 +1,31 @@
 //++ BulliT
 
-#if !defined(AFX_AGGAMEMODES_H__B6D8EF5B_9423_4422_B935_1D71B6146DCA__INCLUDED_)
-#define AFX_AGGAMEMODES_H__B6D8EF5B_9423_4422_B935_1D71B6146DCA__INCLUDED_
+#if !defined(AG_GAMEMODE_MANAGER_H)
+#define AG_GAMEMODE_MANAGER_H
 
 #if _MSC_VER > 1000
 #pragma once
 #endif // _MSC_VER > 1000
 
 #include "ag/global.h"
-#include "ag/game_manager.h"
 
 #include <map>
 
-class AgGameMode
+struct AgGamemodeConfig
 {
-	typedef std::map<AgString, AgGame *, std::less<AgString>> AgGameMap;
-	AgGameMap m_mapGames;
+	AgString m_sCommandName;
+	AgString m_sName;
+	AgString m_sCfg;
+	AgString m_sDescription;
+	int m_iAsterisks = 0;
+};
+
+class AgGamemodeManager
+{
+	typedef std::map<AgString, AgGamemodeConfig *, std::less<AgString>> AgGamemodeConfigMap;
+	AgGamemodeConfigMap m_mapGames;
 	void LoadGames();
-	AgGame *pCurrent;
+	AgGamemodeConfig *pCurrent;
 	float m_fNextCheck;
 	float m_fNextFpsLimitCheck;
 	float m_fNextCvarCheck;
@@ -27,8 +35,8 @@ class AgGameMode
 	static constexpr float CVARS_CHECK_INTERVAL = 5.0;
 
 public:
-	AgGameMode();
-	virtual ~AgGameMode();
+	AgGamemodeManager();
+	virtual ~AgGamemodeManager();
 
 	void Init();
 	void Think();
@@ -44,7 +52,7 @@ public:
 	void NextGamemode(const AgString &sGamemode, CBasePlayer *pPlayer = NULL);
 };
 
-extern DLL_GLOBAL AgGameMode GameMode;
+extern DLL_GLOBAL AgGamemodeManager GameMode;
 const char *AgGamenameChar();
 AgString AgGamename();
 AgString AgGamedescription();
@@ -70,5 +78,5 @@ inline byte AgGametype()
 	return g_GameType;
 };
 
-#endif // !defined(AFX_AGGAMEMODES_H__B6D8EF5B_9423_4422_B935_1D71B6146DCA__INCLUDED_)
+#endif // !defined(AG_GAMEMODE_MANAGER_H)
 //-- Martin Webrant

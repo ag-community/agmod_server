@@ -6302,35 +6302,14 @@ void CBasePlayer::Init()
 	m_bDeathScreenshotTaken = false;
 
 	Spectate_Init();
-	if (ARENA == AgGametype())
-	{
-		// Never allow new players in arena mode to spawn directly.
-		m_bIngame = false;
-		g_pGameRules->m_Arena.ClientConnected(this);
-	}
-	else if (LMS == AgGametype())
-	{
-		// Never allow new players in arena mode to spawn directly.
-		m_bIngame = false;
-		g_pGameRules->m_LMS.ClientConnected(this);
-	}
-	else if (CTF == AgGametype())
-	{
-		g_pGameRules->m_CTF.ClientConnected(this);
 
-		if (ag_match_running.GetBool())
-		{
-			// Check score cache if he was in the game.
-			g_pGameRules->m_ScoreCache.RestoreInGame(this);
-		}
-	}
-	else
+	if (AgGamemode *mode = g_pGameRules->ActiveMode())
+		mode->ClientConnected(this);
+
+	if (ag_match_running.GetBool() && ARENA != AgGametype() && LMS != AgGametype())
 	{
-		if (ag_match_running.GetBool())
-		{
-			// Check score cache if he was in the game.
-			g_pGameRules->m_ScoreCache.RestoreInGame(this);
-		}
+		// Check score cache if he was in the game.
+		g_pGameRules->m_ScoreCache.RestoreInGame(this);
 	}
 
 	if (ag_auto_admin.GetBool())

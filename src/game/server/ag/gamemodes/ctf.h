@@ -9,80 +9,57 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
+#include "ag/gamemode_base.h"
+#include "ag/round_state.h"
+#include "ag/file_cache.h"
+
 #define CTF_TEAM1_NAME "blue"
 #define CTF_TEAM2_NAME "red"
 
-class AgCTFFileItemCache;
-class AgCTFFileItem
+class AgCTFFileItem : public AgFileItem
 {
-	char m_szName[32];
-	Vector m_vOrigin;
-	Vector m_vAngles;
-
-public:
-	AgCTFFileItem();
-	virtual ~AgCTFFileItem();
-
-	void Show();
-
-	friend class AgCTFFileItemCache;
 };
 
-class AgCTFFileItemCache
+class AgCTFFileItemCache : public AgFileItemCache
 {
-	bool m_bInitDone;
-	typedef std::list<AgCTFFileItem *> AgCTFFileItemList;
-	AgCTFFileItemList m_lstFileItems;
-
-	void Load(CBasePlayer *pPlayer = NULL);
-	void Save(CBasePlayer *pPlayer = NULL);
+protected:
+	const char *GetDirectory() const override { return "ctf"; }
+	const char *GetExtension() const override { return "ctf"; }
+	AgFileItem *CreateItem() override;
+	bool ParseItem(AgFileItem *pItem, const char *pszLine) override;
+	void WriteItem(FILE *pFile, AgFileItem *pItem) override;
 
 public:
-	AgCTFFileItemCache();
-	virtual ~AgCTFFileItemCache();
-
-	void Init();
-
-	void Add(const AgString &sItem, CBasePlayer *pPlayer);
-	void Del(CBasePlayer *pPlayer);
-	void List(CBasePlayer *pPlayer);
+	AgCTFFileItemCache() = default;
 };
 
-class AgCTF
+class AgCTF : public AgGamemode
 {
+protected:
+	AgRoundState m_Round;
+
 	int m_iTeam1Captures;
 	int m_iTeam2Captures;
 
 	int m_iPlayerFlag1;
 	int m_iPlayerFlag2;
 
-	enum CTFStatus
-	{
-		Waiting,
-		Countdown,
-		Spawning,
-		Playing
-	};
-	CTFStatus m_Status;
-	float m_fNextCountdown;
-	float m_fMatchStart;
-	AgString m_sWinner;
-
 public:
 	AgCTF();
 	virtual ~AgCTF();
 
 	bool CaptureLimit();
+	bool HasReachedScoreLimit() override { return CaptureLimit(); }
 	void ResetCaptures();
 	void ResetScore(bool bResetCaptures = true);
 	void SendCaptures(CBasePlayer *pPlayer);
-	void Think();
+	void Think() override;
 	void RoundBasedThink();
 
-	void PlayerInitHud(CBasePlayer *pPlayer);
-	void ClientDisconnected(CBasePlayer *pPlayer);
-	void ClientConnected(CBasePlayer *pPlayer);
-	void PlayerKilled(CBasePlayer *pPlayer, entvars_t *pKiller);
+	void PlayerInitHud(CBasePlayer *pPlayer) override;
+	void ClientDisconnected(CBasePlayer *pPlayer) override;
+	void ClientConnected(CBasePlayer *pPlayer) override;
+	void PlayerKilled(CBasePlayer *pPlayer, entvars_t *pKiller) override;
 	void AddPointsForKill(CBasePlayer *pAttacker, CBasePlayer *pKilled);
 
 	void PlayerDropFlag(CBasePlayer *pPlayer, bool bPlayerDrop = false);

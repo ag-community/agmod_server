@@ -5,7 +5,7 @@
 #include "cbase.h"
 #include "player.h"
 #include "gamerules.h"
-#include "ag/gamemode.h"
+#include "ag/gamemode_manager.h"
 #include "ag/global.h"
 #include "cvar.h"
 
@@ -14,9 +14,9 @@
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-DLL_GLOBAL AgGameMode GameMode;
+DLL_GLOBAL AgGamemodeManager GameMode;
 
-DLL_GLOBAL AgGame *g_pGame = NULL;
+DLL_GLOBAL AgGamemodeConfig *g_pGamemodeConfig = NULL;
 DLL_GLOBAL AgString g_sGamemode;
 DLL_GLOBAL AgString g_sNextmode;
 DLL_GLOBAL byte g_GameType = STANDARD;
@@ -47,31 +47,31 @@ void SetupGametype()
 
 AgString AgGamename()
 {
-	if (g_pGame)
-		return g_pGame->m_sName;
+	if (g_pGamemodeConfig)
+		return g_pGamemodeConfig->m_sName;
 
 	return "Half-Life";
 }
 
 const char *AgGamenameChar()
 {
-	if (g_pGame)
-		return g_pGame->m_sName.c_str();
+	if (g_pGamemodeConfig)
+		return g_pGamemodeConfig->m_sName.c_str();
 	else
 		return "Half-Life";
 }
 
 AgString AgGamedescription()
 {
-	if (g_pGame)
-		return g_pGame->m_sDescription;
+	if (g_pGamemodeConfig)
+		return g_pGamemodeConfig->m_sDescription;
 
 	return "Half-Life";
 }
 
 AgString AgSanitizedShortGamename()
 {
-	std::string str = g_pGame->m_sCommandName;
+	std::string str = g_pGamemodeConfig->m_sCommandName;
 
 	// Remove special characters and make it lower case
 	replace_if(str.begin(), str.end(), ::ispunct, '_');
@@ -93,21 +93,21 @@ void nextmode(void)
 		AgConsole(g_sNextmode.size() ? g_sNextmode : g_sGamemode, NULL);
 }
 
-AgGameMode::AgGameMode()
+AgGamemodeManager::AgGamemodeManager()
 {
 	m_fNextCheck = 0;
 	m_fNextFpsLimitCheck = 0;
 	m_fNextCvarCheck = CVARS_CHECK_INTERVAL;
 }
 
-AgGameMode::~AgGameMode()
+AgGamemodeManager::~AgGamemodeManager()
 {
-	for (AgGameMap::iterator itrGames = m_mapGames.begin(); itrGames != m_mapGames.end(); ++itrGames)
+	for (AgGamemodeConfigMap::iterator itrGames = m_mapGames.begin(); itrGames != m_mapGames.end(); ++itrGames)
 		delete (*itrGames).second;
 	m_mapGames.clear();
 }
 
-bool AgGameMode::HandleCommand(CBasePlayer *pPlayer)
+bool AgGamemodeManager::HandleCommand(CBasePlayer *pPlayer)
 {
 	ASSERT(NULL != pPlayer);
 	if (!pPlayer)
@@ -158,15 +158,15 @@ bool AgGameMode::HandleCommand(CBasePlayer *pPlayer)
 	return false;
 }
 
-void AgGameMode::Help(CBasePlayer *pPlayer)
+void AgGamemodeManager::Help(CBasePlayer *pPlayer)
 {
-	for (AgGameMap::iterator itrGames = m_mapGames.begin(); itrGames != m_mapGames.end(); ++itrGames)
+	for (AgGamemodeConfigMap::iterator itrGames = m_mapGames.begin(); itrGames != m_mapGames.end(); ++itrGames)
 	{
 		AgConsole(UTIL_VarArgs("%s - %s", (*itrGames).second->m_sCommandName.c_str(), (*itrGames).second->m_sDescription.c_str()), pPlayer);
 	}
 }
 
-void AgGameMode::Think()
+void AgGamemodeManager::Think()
 {
 	if (m_fNextCheck <= gpGlobals->time && g_sGamemode != CVAR_GET_STRING("sv_ag_gamemode"))
 	{
@@ -265,23 +265,23 @@ void AgGameMode::Think()
 
 		m_fNextCvarCheck = gpGlobals->time + CVARS_CHECK_INTERVAL;
 
-		if (g_pGame)
+		if (g_pGamemodeConfig)
 		{
-			if (g_pGame->m_iAsterisks > 0)
+			if (g_pGamemodeConfig->m_iAsterisks > 0)
 			{
 				// Remove previous asterisks
-				g_pGame->m_sName = g_pGame->m_sName.substr(0, g_pGame->m_sName.length() - g_pGame->m_iAsterisks);
+				g_pGamemodeConfig->m_sName = g_pGamemodeConfig->m_sName.substr(0, g_pGamemodeConfig->m_sName.length() - g_pGamemodeConfig->m_iAsterisks);
 			}
 
 			if (numAsterisks > 0)
-				g_pGame->m_sName.insert(g_pGame->m_sName.end(), numAsterisks, '*');
+				g_pGamemodeConfig->m_sName.insert(g_pGamemodeConfig->m_sName.end(), numAsterisks, '*');
 
-			g_pGame->m_iAsterisks = numAsterisks;
+			g_pGamemodeConfig->m_iAsterisks = numAsterisks;
 		}
 	}
 }
 
-void AgGameMode::Gamemode(const AgString &sGamemode, CBasePlayer *pPlayer)
+void AgGamemodeManager::Gamemode(const AgString &sGamemode, CBasePlayer *pPlayer)
 {
 	if ((IsGamemode(sGamemode) && !pPlayer) || IsAllowedGamemode(sGamemode, pPlayer))
 	{
@@ -295,7 +295,7 @@ void AgGameMode::Gamemode(const AgString &sGamemode, CBasePlayer *pPlayer)
 	}
 }
 
-void AgGameMode::NextGamemode(const AgString &sGamemode, CBasePlayer *pPlayer)
+void AgGamemodeManager::NextGamemode(const AgString &sGamemode, CBasePlayer *pPlayer)
 {
 	if ((IsGamemode(sGamemode) && !pPlayer) || IsAllowedGamemode(sGamemode, pPlayer))
 	{
@@ -308,7 +308,7 @@ void AgGameMode::NextGamemode(const AgString &sGamemode, CBasePlayer *pPlayer)
 	}
 }
 
-void AgGameMode::ExecConfig()
+void AgGamemodeManager::ExecConfig()
 {
 	m_fNextCheck = 0;
 	m_fNextFpsLimitCheck = 0;
@@ -320,11 +320,11 @@ void AgGameMode::ExecConfig()
 		g_sNextmode = "";
 	}
 
-	AgGameMap::iterator itrGames = m_mapGames.find(CVAR_GET_STRING("sv_ag_gamemode"));
+	AgGamemodeConfigMap::iterator itrGames = m_mapGames.find(CVAR_GET_STRING("sv_ag_gamemode"));
 	if (itrGames == m_mapGames.end())
 	{
 		// eh? - error in config.
-		g_pGame = NULL;
+		g_pGamemodeConfig = NULL;
 		AgConsole("Error in server gamemode configuration.\n");
 	}
 	else
@@ -337,8 +337,8 @@ void AgGameMode::ExecConfig()
 		// for this gamemode
 
 		CVar::StartRecordingChanges();
-		g_pGame = (*itrGames).second;
-		SERVER_COMMAND(UTIL_VarArgs("exec gamemodes/%s\n", g_pGame->m_sCfg.c_str()));
+		g_pGamemodeConfig = (*itrGames).second;
+		SERVER_COMMAND(UTIL_VarArgs("exec gamemodes/%s\n", g_pGamemodeConfig->m_sCfg.c_str()));
 		SERVER_EXECUTE_HL();
 		CVar::StopRecordingGamemodeChanges();
 
@@ -382,19 +382,19 @@ void AgGameMode::ExecConfig()
 	}
 }
 
-bool AgGameMode::IsGamemode(const AgString &sGamemode)
+bool AgGamemodeManager::IsGamemode(const AgString &sGamemode)
 {
 	if (0 == sGamemode.size())
 		return false;
 
-	AgGameMap::iterator itrGames = m_mapGames.find(sGamemode);
+	AgGamemodeConfigMap::iterator itrGames = m_mapGames.find(sGamemode);
 	if (itrGames == m_mapGames.end())
 		return false;
 
 	return true;
 }
 
-bool AgGameMode::IsAllowedGamemode(const AgString &sGamemode, CBasePlayer *pPlayer)
+bool AgGamemodeManager::IsAllowedGamemode(const AgString &sGamemode, CBasePlayer *pPlayer)
 {
 	if (!IsGamemode(sGamemode))
 		return false;
@@ -407,21 +407,21 @@ bool AgGameMode::IsAllowedGamemode(const AgString &sGamemode, CBasePlayer *pPlay
 	return (NULL != strstr(CVAR_GET_STRING("sv_ag_allowed_gamemodes"), sGamemode.c_str()));
 }
 
-void AgGameMode::Init()
+void AgGamemodeManager::Init()
 {
 	// Set this initially, so server dont restart map right away.
 	g_sGamemode = CVAR_GET_STRING("sv_ag_gamemode");
 
 	LoadGames();
 
-	for (AgGameMap::iterator itrGames = m_mapGames.begin(); itrGames != m_mapGames.end(); ++itrGames)
+	for (AgGamemodeConfigMap::iterator itrGames = m_mapGames.begin(); itrGames != m_mapGames.end(); ++itrGames)
 	{
 		ADD_SERVER_COMMAND((char *)(*itrGames).second->m_sCommandName.c_str(), gamemode);
 	}
 	ADD_SERVER_COMMAND("agnextmode", nextmode);
 }
 
-void AgGameMode::LoadGames()
+void AgGamemodeManager::LoadGames()
 {
 	if (0 != m_mapGames.size())
 		return; // Already loaded.
@@ -453,7 +453,7 @@ void AgGameMode::LoadGames()
 			continue;
 		szData[iRead] = '\0';
 
-		AgGame *pGame = new AgGame;
+		AgGamemodeConfig *pGame = new AgGamemodeConfig;
 		char *pszParse = NULL;
 		pszParse = strtok(szData, "\n");
 		if (pszParse)
@@ -470,13 +470,13 @@ void AgGameMode::LoadGames()
 				pGame->m_sDescription = pGame->m_sDescription.substr(2);
 			}
 
-			if (pGame->IsValid())
+			if (0 != pGame->m_sCommandName.size() && 31 > pGame->m_sCommandName.size() && 0 != pGame->m_sName.size() && 0 != pGame->m_sCfg.size() && 0 != pGame->m_sDescription.size())
 			{
 				AgTrim(pGame->m_sCommandName);
 				AgTrim(pGame->m_sDescription);
 				AgTrim(pGame->m_sName);
 				AgTrim(pGame->m_sCfg);
-				m_mapGames.insert(AgGameMap::value_type(pGame->m_sCommandName, pGame));
+				m_mapGames.insert(AgGamemodeConfigMap::value_type(pGame->m_sCommandName, pGame));
 				AgConsole(UTIL_VarArgs("Added gamemode %s", pGame->m_sCommandName.c_str()));
 			}
 			else

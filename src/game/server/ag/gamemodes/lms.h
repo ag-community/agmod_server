@@ -9,36 +9,29 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-class AgLMS
+#include "ag/gamemode_base.h"
+#include "ag/round_state.h"
+
+class AgLMS : public AgGamemode
 {
-	enum LMSStatus
-	{
-		Waiting,
-		Countdown,
-		Spawning,
-		Playing
-	};
-	LMSStatus m_Status;
-	float m_fNextCountdown;
-	float m_fMatchStart;
-	float m_fNextSay;
-	AgString m_sWinner;
+protected:
+	AgRoundState m_Round;
 
 public:
 	AgLMS();
 	virtual ~AgLMS();
 
-	void Think();
+	void Think() override;
 
-	void ClientDisconnected(CBasePlayer *pPlayer);
-	void ClientConnected(CBasePlayer *pPlayer);
+	void ClientDisconnected(CBasePlayer *pPlayer) override;
+	void ClientConnected(CBasePlayer *pPlayer) override;
 
-	bool CanTakeDamage();
+	bool CanTakeDamage() override;
 };
 
 inline bool AgLMS::CanTakeDamage()
 {
-	return Playing == m_Status;
+	return AgRoundState::Playing == m_Round.m_Status;
 }
 
 #endif // !defined(__AG_LMS_H__)

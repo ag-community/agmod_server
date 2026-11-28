@@ -23,7 +23,7 @@
 #include "ag/infointermission.h"
 #include "ag/suddendeath.h"
 #include "ag/timeout.h"
-#include "ag/gamemode.h"
+#include "ag/gamemode_manager.h"
 
 class AgGameRules : public CGameRules
 {
@@ -35,6 +35,8 @@ protected:
 public:
 	AgGameRules();
 	virtual ~AgGameRules();
+
+	AgGamemode *ActiveMode();
 
 	// Overidden
 	virtual bool ClientCommand(CBasePlayer *pPlayer, const char *pcmd);

@@ -64,13 +64,15 @@ AgCTF::AgCTF()
 	s_iPlayerFlag2 = 0;
 	m_iPlayerFlag1 = 0;
 	m_iPlayerFlag2 = 0;
-	m_fNextCountdown = 0.0;
-	m_fMatchStart = 0.0;
+	m_Round.m_fNextCountdown = 0.0;
+	m_Round.m_fMatchStart = 0.0;
 
 	if (ag_ctf_roundbased.GetBool())
-		m_Status = Waiting;
+		m_Round.m_Status = AgRoundState::Waiting;
 	else
-		m_Status = Playing;
+		m_Round.m_Status = AgRoundState::Playing;
+
+	m_FileItemCache.Reload();
 }
 
 AgCTF::~AgCTF()
@@ -86,17 +88,7 @@ void AgCTF::PlayerInitHud(CBasePlayer *pPlayer)
 	if (!pPlayer->pev)
 		return;
 
-	MESSAGE_BEGIN(MSG_ONE, gmsgTeamScore, NULL, pPlayer->pev);
-	WRITE_STRING(CTF_TEAM1_NAME);
-	WRITE_SHORT(m_iTeam1Captures);
-	WRITE_SHORT(0);
-	MESSAGE_END();
-
-	MESSAGE_BEGIN(MSG_ONE, gmsgTeamScore, NULL, pPlayer->pev);
-	WRITE_STRING(CTF_TEAM2_NAME);
-	WRITE_SHORT(m_iTeam2Captures);
-	WRITE_SHORT(0);
-	MESSAGE_END();
+	SendCaptures(pPlayer);
 }
 
 bool AgCTF::CaptureLimit()
@@ -134,7 +126,7 @@ void AgCTF::ResetScore(bool bResetCaptures)
 	m_iTeam1Captures = -1;
 	m_iTeam2Captures = -1;
 	s_iTeam1Captures = s_iTeam2Captures = 0;
-	m_Status = Playing;
+	m_Round.m_Status = AgRoundState::Playing;
 
 	if (bResetCaptures)
 		ResetCaptures();
@@ -231,29 +223,24 @@ void AgCTF::Think()
 void AgCTF::RoundBasedThink()
 {
 	// We only update status once every second.
-	if (m_fNextCountdown > gpGlobals->time)
+	if (m_Round.m_fNextCountdown > gpGlobals->time)
 		return;
-	m_fNextCountdown = gpGlobals->time + 1.0;
+	m_Round.m_fNextCountdown = gpGlobals->time + 1.0;
 
 	// Handle the status
-	if (Waiting == m_Status)
+	if (AgRoundState::Waiting == m_Round.m_Status)
 	{
 		g_bPaused = true;
-		m_Status = Countdown;
-		m_fMatchStart = gpGlobals->time + GetCountdownTimeOrDefault(8.0f);
-		m_fNextCountdown = gpGlobals->time + 3.0;
+		m_Round.m_Status = AgRoundState::Countdown;
+		m_Round.m_fMatchStart = gpGlobals->time + GetCountdownTimeOrDefault(8.0f);
+		m_Round.m_fNextCountdown = gpGlobals->time + 3.0;
 
 		// Write waiting message
-		MESSAGE_BEGIN(MSG_ALL, gmsgCountdown);
-		WRITE_BYTE(50);
-		WRITE_BYTE(1);
-		WRITE_STRING(m_sWinner.c_str());
-		WRITE_STRING("");
-		MESSAGE_END();
+		m_Round.SendWaitingMessage();
 	}
-	else if (Countdown == m_Status)
+	else if (AgRoundState::Countdown == m_Round.m_Status)
 	{
-		if (m_fMatchStart < gpGlobals->time)
+		if (m_Round.m_fMatchStart < gpGlobals->time)
 		{
 			// Clear out the map
 			AgResetMap();
@@ -261,8 +248,8 @@ void AgCTF::RoundBasedThink()
 			// Reset CTF items
 			ResetCaptures();
 
-			m_Status = Spawning;
-			m_sWinner = "";
+			m_Round.m_Status = AgRoundState::Spawning;
+			m_Round.m_sWinner = "";
 
 			// Time to start playing.
 			for (int i = 1; i <= gpGlobals->maxClients; i++)
@@ -275,35 +262,24 @@ void AgCTF::RoundBasedThink()
 				}
 			}
 
-			m_Status = Playing;
+			m_Round.m_Status = AgRoundState::Playing;
 
 			// Stop countdown
-			MESSAGE_BEGIN(MSG_ALL, gmsgCountdown);
-			WRITE_BYTE(-1);
-			WRITE_BYTE(0);
-			WRITE_STRING("");
-			WRITE_STRING("");
-			MESSAGE_END();
+			m_Round.SendCountdownStop();
 
 			g_bPaused = false;
 		}
 		else
 		{
-			// Write countdown message.
-			MESSAGE_BEGIN(MSG_ALL, gmsgCountdown);
-			WRITE_BYTE((int)(m_fMatchStart - gpGlobals->time));
-			WRITE_BYTE(1);
-			WRITE_STRING("");
-			WRITE_STRING("");
-			MESSAGE_END();
+			m_Round.SendCountdown((int)(m_Round.m_fMatchStart - gpGlobals->time));
 		}
 	}
 }
 
 void AgCTF::RoundOver(const char *pszWinner)
 {
-	m_sWinner = pszWinner;
-	m_Status = Waiting;
+	m_Round.m_sWinner = pszWinner;
+	m_Round.m_Status = AgRoundState::Waiting;
 }
 
 void AgCTF::ClientConnected(CBasePlayer *pPlayer)
@@ -1307,172 +1283,5 @@ LINK_ENTITY_TO_CLASS(ctf_redspawn, AgCTFSpawn); // CCTF map compatibility
 LINK_ENTITY_TO_CLASS(info_ctfspawn, AgCTFSpawn); // OP4 CTF map compatibility
 LINK_ENTITY_TO_CLASS(info_player_ctf_blue, AgCTFSpawn); // HLE CTF map compatibility
 LINK_ENTITY_TO_CLASS(info_player_ctf_red, AgCTFSpawn); // HLE CTF map compatibility
-
-class AgCTFFileItemCache;
-
-AgCTFFileItem::AgCTFFileItem()
-{
-	m_vOrigin = Vector(0, 0, 0);
-	m_vAngles = Vector(0, 0, 0);
-	m_szName[0] = '\0';
-}
-
-AgCTFFileItem::~AgCTFFileItem()
-{
-}
-
-void AgCTFFileItem::Show()
-{
-	CLaserSpot *pSpot = CLaserSpot::CreateSpot();
-	UTIL_SetOrigin(pSpot->pev, m_vOrigin);
-	pSpot->LiveForTime(5.0);
-}
-
-AgCTFFileItemCache::AgCTFFileItemCache()
-{
-	m_bInitDone = false;
-	Load();
-}
-
-AgCTFFileItemCache::~AgCTFFileItemCache()
-{
-	// Delete all.
-	for (AgCTFFileItemList::iterator itrFileItems = m_lstFileItems.begin(); itrFileItems != m_lstFileItems.end(); ++itrFileItems)
-		delete *itrFileItems;
-	m_lstFileItems.clear();
-}
-
-void AgCTFFileItemCache::Add(const AgString &sFileItem, CBasePlayer *pPlayer)
-{
-	ASSERT(NULL != pPlayer);
-	if (!pPlayer)
-		return;
-	ASSERT(NULL != pPlayer->pev);
-	if (!pPlayer->pev)
-		return;
-
-	if (0 == sFileItem.size())
-		return;
-
-	AgCTFFileItem *pFileItem = new AgCTFFileItem;
-	strcpy(pFileItem->m_szName, sFileItem.c_str());
-	pFileItem->m_vOrigin = pPlayer->pev->origin;
-	pFileItem->m_vAngles = pPlayer->pev->angles;
-
-	m_lstFileItems.push_back(pFileItem);
-	pFileItem->Show();
-
-	Save(pPlayer);
-
-	AgConsole(UTIL_VarArgs("Added item %s.", (const char *)sFileItem.c_str()), pPlayer);
-}
-
-void AgCTFFileItemCache::Del(CBasePlayer *pPlayer)
-{
-	ASSERT(NULL != pPlayer);
-	if (!pPlayer)
-		return;
-	ASSERT(NULL != pPlayer->pev);
-	if (!pPlayer->pev)
-		return;
-
-	if (0 == m_lstFileItems.size())
-		return;
-
-	AgCTFFileItem *pFileItem = m_lstFileItems.back();
-	AgConsole(UTIL_VarArgs("Deleted last item - %s.", pFileItem->m_szName, pPlayer));
-	m_lstFileItems.pop_back();
-	Save(pPlayer);
-}
-
-void AgCTFFileItemCache::List(CBasePlayer *pPlayer)
-{
-	ASSERT(NULL != pPlayer);
-	if (!pPlayer)
-		return;
-	ASSERT(NULL != pPlayer->pev);
-	if (!pPlayer->pev)
-		return;
-
-	for (AgCTFFileItemList::iterator itrFileItems = m_lstFileItems.begin(); itrFileItems != m_lstFileItems.end(); ++itrFileItems)
-	{
-		AgConsole(UTIL_VarArgs("%s", (const char *)(*itrFileItems)->m_szName), pPlayer);
-		(*itrFileItems)->Show();
-	}
-}
-
-void AgCTFFileItemCache::Load(CBasePlayer *pPlayer)
-{
-	for (AgCTFFileItemList::iterator itrFileItems = m_lstFileItems.begin(); itrFileItems != m_lstFileItems.end(); ++itrFileItems)
-		delete *itrFileItems;
-	m_lstFileItems.clear();
-
-	char szFile[MAX_PATH];
-	char szData[20000];
-	sprintf(szFile, "%s/ctf/%s.ctf", AgGetDirectory(), STRING(gpGlobals->mapname));
-	FILE *pFile = fopen(szFile, "r");
-	if (!pFile)
-	{
-		// file error
-		return;
-	}
-
-	int iRead = fread(szData, sizeof(char), sizeof(szData) - 2, pFile);
-	fclose(pFile);
-	if (0 >= iRead)
-		return;
-	szData[iRead] = '\0';
-
-	char *pszCTFString = strtok(szData, "\n");
-	while (pszCTFString != NULL)
-	{
-		AgCTFFileItem *pFileItem = new AgCTFFileItem;
-		sscanf(pszCTFString, "%s %f %f %f %f %f %f\n", pFileItem->m_szName, &pFileItem->m_vOrigin.x, &pFileItem->m_vOrigin.y, &pFileItem->m_vOrigin.z, &pFileItem->m_vAngles.x, &pFileItem->m_vAngles.y, &pFileItem->m_vAngles.z);
-		m_lstFileItems.push_back(pFileItem);
-		pszCTFString = strtok(NULL, "\n");
-	}
-}
-
-void AgCTFFileItemCache::Save(CBasePlayer *pPlayer)
-{
-	if (0 == m_lstFileItems.size())
-		return;
-
-	char szFile[MAX_PATH];
-	sprintf(szFile, "%s/ctf/%s.ctf", AgGetDirectory(), STRING(gpGlobals->mapname));
-	FILE *pFile = fopen(szFile, "wb");
-	if (!pFile)
-	{
-		// file error
-		AgConsole(UTIL_VarArgs("Couldn't create/save FileItem file %s.", szFile), pPlayer);
-		return;
-	}
-
-	// Loop and write the file.
-	for (AgCTFFileItemList::iterator itrFileItems = m_lstFileItems.begin(); itrFileItems != m_lstFileItems.end(); ++itrFileItems)
-	{
-		// Append.
-		AgCTFFileItem *pFileItem = *itrFileItems;
-		fprintf(pFile, "%s %f %f %f %f %f %f\n", pFileItem->m_szName, pFileItem->m_vOrigin.x, pFileItem->m_vOrigin.y, pFileItem->m_vOrigin.z, pFileItem->m_vAngles.x, pFileItem->m_vAngles.y, pFileItem->m_vAngles.z);
-	}
-
-	fflush(pFile);
-	fclose(pFile);
-}
-
-void AgCTFFileItemCache::Init()
-{
-	if (m_bInitDone)
-		return;
-	m_bInitDone = true;
-
-	for (AgCTFFileItemList::iterator itrFileItems = m_lstFileItems.begin(); itrFileItems != m_lstFileItems.end(); ++itrFileItems)
-	{
-		AgCTFFileItem *pFileItem = *itrFileItems;
-
-		if (g_pGameRules->IsAllowedToSpawn(pFileItem->m_szName))
-			CBaseEntity::Create(pFileItem->m_szName, pFileItem->m_vOrigin, pFileItem->m_vAngles, INDEXENT(0));
-	}
-}
 
 //-- Martin Webrant

@@ -9,29 +9,18 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-class AgArena
+#include "ag/gamemode_base.h"
+#include "ag/round_state.h"
+
+class AgArena : public AgGamemode
 {
+protected:
+	AgRoundState m_Round;
+
 	typedef std::list<int> AgWaitList;
-	enum ArenaStatus
-	{
-		Waiting,
-		Countdown,
-		Spawning,
-		Playing,
-		PlayerDied
-	};
-
 	AgWaitList m_lstWaitList;
-	ArenaStatus m_Status;
-
-	float m_fNextCountdown;
-	float m_fMatchStart;
-	float m_fNextSay;
-
 	EHANDLE m_Player1;
 	EHANDLE m_Player2;
-
-	AgString m_sWinner;
 
 	CBasePlayer *GetPlayer1();
 	CBasePlayer *GetPlayer2();
@@ -43,16 +32,16 @@ public:
 	AgArena();
 	virtual ~AgArena();
 
-	void Think();
+	void Think() override;
 
 	void Ready(CBasePlayer *pPlayer);
 	void NotReady(CBasePlayer *pPlayer);
 
-	void ClientDisconnected(CBasePlayer *pPlayer);
-	void ClientConnected(CBasePlayer *pPlayer);
+	void ClientDisconnected(CBasePlayer *pPlayer) override;
+	void ClientConnected(CBasePlayer *pPlayer) override;
 
-	bool CanTakeDamage();
-	bool CanHaveItem();
+	bool CanTakeDamage() override;
+	bool CanHaveItem() override;
 };
 
 inline CBasePlayer *AgArena::GetPlayer1()
@@ -73,12 +62,12 @@ inline CBasePlayer *AgArena::GetPlayer2()
 
 inline bool AgArena::CanTakeDamage()
 {
-	return Playing == m_Status || PlayerDied == m_Status;
+	return AgRoundState::Playing == m_Round.m_Status || AgRoundState::PlayerDied == m_Round.m_Status;
 }
 
 inline bool AgArena::CanHaveItem()
 {
-	return Spawning == m_Status;
+	return AgRoundState::Spawning == m_Round.m_Status;
 }
 
 #endif // !defined(AFX_AGARENA_H__1929C55A_3034_4C89_8398_1F8243B83499__INCLUDED_)

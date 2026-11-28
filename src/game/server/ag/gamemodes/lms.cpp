@@ -19,9 +19,9 @@ extern int gmsgCountdown;
 
 AgLMS::AgLMS()
 {
-	m_fMatchStart = 0.0;
-	m_fNextCountdown = 0.0;
-	m_Status = Waiting;
+	m_Round.m_fMatchStart = 0.0;
+	m_Round.m_fNextCountdown = 0.0;
+	m_Round.m_Status = AgRoundState::Waiting;
 }
 
 AgLMS::~AgLMS()
@@ -33,11 +33,11 @@ void AgLMS::Think()
 	if (!g_pGameRules)
 		return;
 
-	if (Playing == m_Status)
+	if (AgRoundState::Playing == m_Round.m_Status)
 	{
-		if (m_fNextCountdown > gpGlobals->time)
+		if (m_Round.m_fNextCountdown > gpGlobals->time)
 			return;
-		m_fNextCountdown = gpGlobals->time + 0.5;
+		m_Round.m_fNextCountdown = gpGlobals->time + 0.5;
 
 		if (g_pGameRules->IsTeamplay())
 		{
@@ -74,13 +74,13 @@ void AgLMS::Think()
 
 			if (!(setTeams.size() > 1))
 			{
-				m_sWinner = "";
+				m_Round.m_sWinner = "";
 				AgStringSet::iterator itrTeams = setTeams.begin();
 				if (itrTeams != setTeams.end())
 				{
-					m_sWinner = *itrTeams;
+					m_Round.m_sWinner = *itrTeams;
 				}
-				m_Status = Waiting;
+				m_Round.m_Status = AgRoundState::Waiting;
 			}
 		}
 		else
@@ -120,22 +120,22 @@ void AgLMS::Think()
 
 			if (!(iPlayersAlive > 1))
 			{
-				m_sWinner = "";
+				m_Round.m_sWinner = "";
 				if (pPlayer)
-					m_sWinner = pPlayer->GetName();
-				m_Status = Waiting;
+					m_Round.m_sWinner = pPlayer->GetName();
+				m_Round.m_Status = AgRoundState::Waiting;
 			}
 		}
 	}
 	else
 	{
 		// We only update status once every second.
-		if (m_fNextCountdown > gpGlobals->time)
+		if (m_Round.m_fNextCountdown > gpGlobals->time)
 			return;
-		m_fNextCountdown = gpGlobals->time + 1.0;
+		m_Round.m_fNextCountdown = gpGlobals->time + 1.0;
 
 		// Handle the status
-		if (Waiting == m_Status)
+		if (AgRoundState::Waiting == m_Round.m_Status)
 		{
 			if (g_pGameRules->IsTeamplay())
 			{
@@ -152,9 +152,9 @@ void AgLMS::Think()
 
 				if (setTeams.size() > 1)
 				{
-					m_Status = Countdown;
-					m_fMatchStart = gpGlobals->time + GetCountdownTimeOrDefault(8.0f);
-					m_fNextCountdown = gpGlobals->time + 3.0;
+					m_Round.m_Status = AgRoundState::Countdown;
+					m_Round.m_fMatchStart = gpGlobals->time + GetCountdownTimeOrDefault(8.0f);
+					m_Round.m_fNextCountdown = gpGlobals->time + 3.0;
 				}
 			}
 			else
@@ -170,23 +170,18 @@ void AgLMS::Think()
 				}
 				if (iPlayers > 1)
 				{
-					m_Status = Countdown;
-					m_fMatchStart = gpGlobals->time + GetCountdownTimeOrDefault(8.0f);
-					m_fNextCountdown = gpGlobals->time + 3.0;
+					m_Round.m_Status = AgRoundState::Countdown;
+					m_Round.m_fMatchStart = gpGlobals->time + GetCountdownTimeOrDefault(8.0f);
+					m_Round.m_fNextCountdown = gpGlobals->time + 3.0;
 				}
 			}
 
 			// Write waiting message
-			MESSAGE_BEGIN(MSG_ALL, gmsgCountdown);
-			WRITE_BYTE(50);
-			WRITE_BYTE(1);
-			WRITE_STRING(m_sWinner.c_str());
-			WRITE_STRING("");
-			MESSAGE_END();
+			m_Round.SendWaitingMessage();
 		}
-		else if (Countdown == m_Status)
+		else if (AgRoundState::Countdown == m_Round.m_Status)
 		{
-			if (m_fMatchStart < gpGlobals->time)
+			if (m_Round.m_fMatchStart < gpGlobals->time)
 			{
 				// Clear out the map
 				AgResetMap();
@@ -203,8 +198,8 @@ void AgLMS::Think()
 					}
 				}
 
-				m_Status = Spawning;
-				m_sWinner = "";
+				m_Round.m_Status = AgRoundState::Spawning;
+				m_Round.m_sWinner = "";
 
 				// Time to start playing.
 				for (i = 1; i <= gpGlobals->maxClients; i++)
@@ -221,25 +216,14 @@ void AgLMS::Think()
 					}
 				}
 
-				m_Status = Playing;
+				m_Round.m_Status = AgRoundState::Playing;
 
 				// Stop countdown
-				MESSAGE_BEGIN(MSG_ALL, gmsgCountdown);
-				WRITE_BYTE(-1);
-				WRITE_BYTE(0);
-				WRITE_STRING("");
-				WRITE_STRING("");
-				MESSAGE_END();
+				m_Round.SendCountdownStop();
 			}
 			else
 			{
-				// Write countdown message.
-				MESSAGE_BEGIN(MSG_ALL, gmsgCountdown);
-				WRITE_BYTE((int)(m_fMatchStart - gpGlobals->time));
-				WRITE_BYTE(1);
-				WRITE_STRING("");
-				WRITE_STRING("");
-				MESSAGE_END();
+				m_Round.SendCountdown((int)(m_Round.m_fMatchStart - gpGlobals->time));
 			}
 		}
 	}

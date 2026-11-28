@@ -19,12 +19,11 @@ extern int gmsgCountdown;
 
 AgArena::AgArena()
 {
-	m_fMatchStart = 0.0;
-	m_fNextCountdown = 0.0;
-	m_fNextSay = 0.0;
+	m_Round.m_fMatchStart = 0.0;
+	m_Round.m_fNextCountdown = 0.0;
 	m_Player1 = NULL;
 	m_Player2 = NULL;
-	m_Status = Waiting;
+	m_Round.m_Status = AgRoundState::Waiting;
 }
 
 AgArena::~AgArena()
@@ -36,15 +35,15 @@ void AgArena::Think()
 	if (!g_pGameRules)
 		return;
 
-	if (Playing == m_Status)
+	if (AgRoundState::Playing == m_Round.m_Status)
 	{
 		CBasePlayer *pPlayer1 = GetPlayer1();
 		CBasePlayer *pPlayer2 = GetPlayer2();
 
 		if (!pPlayer1 || pPlayer1 && !pPlayer1->IsAlive() || !pPlayer2 || pPlayer2 && !pPlayer2->IsAlive())
 		{
-			m_Status = PlayerDied;
-			m_fNextCountdown = gpGlobals->time + 3.0; // Let the effect of him dying play for 3 seconds
+			m_Round.m_Status = AgRoundState::PlayerDied;
+			m_Round.m_fNextCountdown = gpGlobals->time + 3.0; // Let the effect of him dying play for 3 seconds
 
 			if (pPlayer1)
 				pPlayer1->SetIngame(false); // Cant respawn
@@ -55,12 +54,12 @@ void AgArena::Think()
 	else
 	{
 		// We only update status once every second.
-		if (m_fNextCountdown > gpGlobals->time)
+		if (m_Round.m_fNextCountdown > gpGlobals->time)
 			return;
-		m_fNextCountdown = gpGlobals->time + 1.0;
+		m_Round.m_fNextCountdown = gpGlobals->time + 1.0;
 
 		// Handle the status
-		if (Waiting == m_Status)
+		if (AgRoundState::Waiting == m_Round.m_Status)
 		{
 			// Get new arena players.
 			if (!GetPlayer1())
@@ -85,28 +84,23 @@ void AgArena::Think()
 
 			if (GetPlayer1() && GetPlayer2())
 			{
-				m_Status = Countdown;
-				m_fMatchStart = gpGlobals->time + GetCountdownTimeOrDefault(5.0f);
-				m_fNextCountdown = gpGlobals->time + 2.0;
+				m_Round.m_Status = AgRoundState::Countdown;
+				m_Round.m_fMatchStart = gpGlobals->time + GetCountdownTimeOrDefault(5.0f);
+				m_Round.m_fNextCountdown = gpGlobals->time + 2.0;
 			}
 
 			// Write waiting message
-			MESSAGE_BEGIN(MSG_ALL, gmsgCountdown);
-			WRITE_BYTE(50);
-			WRITE_BYTE(1);
-			WRITE_STRING(m_sWinner.c_str());
-			WRITE_STRING("");
-			MESSAGE_END();
+			m_Round.SendWaitingMessage();
 		}
-		else if (Countdown == m_Status)
+		else if (AgRoundState::Countdown == m_Round.m_Status)
 		{
 			if (!GetPlayer1() || !GetPlayer2())
 			{
-				m_Status = Waiting; // Someone left in middle of countdown. Go back to waiting.
+				m_Round.m_Status = AgRoundState::Waiting; // Someone left in middle of countdown. Go back to waiting.
 				return;
 			}
 
-			if (m_fMatchStart < gpGlobals->time)
+			if (m_Round.m_fMatchStart < gpGlobals->time)
 			{
 				// Clear out the map
 				AgResetMap();
@@ -116,8 +110,8 @@ void AgArena::Think()
 				g_pGameRules->m_ScoreCache.UpdateScore(GetPlayer1());
 				g_pGameRules->m_ScoreCache.UpdateScore(GetPlayer2());
 
-				m_Status = Spawning;
-				m_sWinner = "";
+				m_Round.m_Status = AgRoundState::Spawning;
+				m_Round.m_sWinner = "";
 
 				// Time to start playing.
 				if (GetPlayer1()->IsSpectator())
@@ -134,34 +128,23 @@ void AgArena::Think()
 				else
 					GetPlayer2()->RespawnMatch();
 
-				m_Status = Playing;
+				m_Round.m_Status = AgRoundState::Playing;
 
 				// Stop countdown
-				MESSAGE_BEGIN(MSG_ALL, gmsgCountdown);
-				WRITE_BYTE(-1);
-				WRITE_BYTE(0);
-				WRITE_STRING("");
-				WRITE_STRING("");
-				MESSAGE_END();
+				m_Round.SendCountdownStop();
 			}
 			else
 			{
-				// Write countdown message.
-				MESSAGE_BEGIN(MSG_ALL, gmsgCountdown);
-				WRITE_BYTE((int)(m_fMatchStart - gpGlobals->time));
-				WRITE_BYTE(1);
-				WRITE_STRING(GetPlayer1()->GetName());
-				WRITE_STRING(GetPlayer2()->GetName());
-				MESSAGE_END();
+				m_Round.SendCountdown((int)(m_Round.m_fMatchStart - gpGlobals->time), GetPlayer1()->GetName(), GetPlayer2()->GetName());
 			}
 		}
-		else if (PlayerDied == m_Status)
+		else if (AgRoundState::PlayerDied == m_Round.m_Status)
 		{
 			CBasePlayer *pPlayer1 = GetPlayer1();
 			CBasePlayer *pPlayer2 = GetPlayer2();
 
-			m_Status = Waiting;
-			m_sWinner = "";
+			m_Round.m_Status = AgRoundState::Waiting;
+			m_Round.m_sWinner = "";
 
 			if (pPlayer1 && !pPlayer1->IsAlive())
 			{
@@ -178,7 +161,7 @@ void AgArena::Think()
 				{
 					pPlayer2->SetIngame(false);
 					if (pPlayer2->IsAlive())
-						m_sWinner = pPlayer2->GetName();
+						m_Round.m_sWinner = pPlayer2->GetName();
 				}
 			}
 
@@ -196,7 +179,7 @@ void AgArena::Think()
 				{
 					pPlayer1->SetIngame(false);
 					if (pPlayer1->IsAlive())
-						m_sWinner = pPlayer1->GetName();
+						m_Round.m_sWinner = pPlayer1->GetName();
 				}
 			}
 
@@ -258,7 +241,7 @@ void AgArena::Ready(CBasePlayer *pPlayer)
 	if (!pPlayer->pev)
 		return;
 
-	if (Countdown != m_Status)
+	if (AgRoundState::Countdown != m_Round.m_Status)
 	{
 		Add(pPlayer);
 		ClientPrint(pPlayer->pev, HUD_PRINTCONSOLE, "Changed mode to READY.\n");
@@ -278,7 +261,7 @@ void AgArena::NotReady(CBasePlayer *pPlayer)
 	if (!pPlayer->pev)
 		return;
 
-	if (Countdown != m_Status)
+	if (AgRoundState::Countdown != m_Round.m_Status)
 	{
 		pPlayer->SetIngame(false);
 		if (!pPlayer->IsSpectator())

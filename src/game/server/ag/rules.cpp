@@ -51,6 +51,23 @@ AgGameRules::~AgGameRules()
 	AdminCache.Save();
 }
 
+AgGamemode *AgGameRules::ActiveMode()
+{
+	switch (AgGametype())
+	{
+	case ARENA:
+		return &m_Arena;
+	case LMS:
+		return &m_LMS;
+	case CTF:
+		return &m_CTF;
+	case DOM:
+		return &m_DOM;
+	default:
+		return nullptr;
+	}
+}
+
 bool AgGameRules::AgThink()
 {
 	// Check if gamerules are correct.
@@ -80,22 +97,12 @@ bool AgGameRules::AgThink()
 	// Update vote status.
 	// Handled globally m_Vote.Think();
 
-	if (CTF == AgGametype())
-		m_CTF.Think();
-	//++ muphicks
-	else if (DOM == AgGametype())
-		m_DOM.Think();
-	//-- muphicks
+	if (AgGamemode *mode = ActiveMode())
+	{
+		mode->Think();
 
-	if (LMS == AgGametype())
-	{
-		// Arena status.
-		m_LMS.Think();
-	}
-	else if (ARENA == AgGametype())
-	{
-		// Arena status.
-		m_Arena.Think();
+		if (mode->HasReachedScoreLimit())
+			GoToIntermission();
 	}
 	else
 	{
@@ -590,6 +597,7 @@ bool AgGameRules::ClientConnected(edict_t *pEntity, const char *pszName, const c
 		else
 			(*itrIPAddress).second = ENTINDEX(pEntity);
 	}
+
 	return true;
 }
 
@@ -634,16 +642,8 @@ void AgGameRules::ClientDisconnected(edict_t *pClient)
 				}
 			}
 
-			if (ARENA == AgGametype())
-				m_Arena.ClientDisconnected(pPlayer);
-			else if (LMS == AgGametype())
-				m_LMS.ClientDisconnected(pPlayer);
-			else if (CTF == AgGametype())
-				m_CTF.ClientDisconnected(pPlayer);
-			//++ muphicks
-			else if (DOM == AgGametype())
-				m_DOM.ClientDisconnected(pPlayer);
-			//-- muphicks
+			if (AgGamemode *mode = ActiveMode())
+				mode->ClientDisconnected(pPlayer);
 		}
 	}
 }
@@ -729,6 +729,9 @@ void AgGameRules::PlayerKilled(CBasePlayer *pVictim, entvars_t *pKiller, entvars
 	if (pKillerPlayer && pVictim != pKillerPlayer)
 		m_ScoreCache.UpdateScore(pKillerPlayer);
 
+	if (AgGamemode *mode = ActiveMode())
+		mode->PlayerKilled(pVictim, pKiller);
+
 	pVictim->TakeDeathScreenshot();
 }
 
@@ -810,7 +813,7 @@ bool AgGameRules::CanHavePlayerItem(CBasePlayer *pPlayer, CBasePlayerItem *pItem
 	if (!pPlayer->IsAlive())
 		return false;
 
-	if (ARENA == AgGametype() && m_Arena.CanHaveItem())
+	if (AgGamemode *mode = ActiveMode(); mode && mode->CanHaveItem())
 		return true;
 
 	const char *pszClass = STRING(pItem->pev->classname);
@@ -846,7 +849,7 @@ bool AgGameRules::CanHaveItem(CBasePlayer *pPlayer, CItem *pItem)
 	if (!pPlayer->IsAlive())
 		return false;
 
-	if (ARENA == AgGametype() && m_Arena.CanHaveItem())
+	if (AgGamemode *mode = ActiveMode(); mode && mode->CanHaveItem())
 		return true;
 
 	const char *pszClass = STRING(pItem->pev->classname);
@@ -884,7 +887,7 @@ bool AgGameRules::IsAllowedToSpawn(CBaseEntity *pEntity)
 	if (!pEntity)
 		return false;
 
-	if (ARENA == AgGametype() && m_Arena.CanHaveItem())
+	if (AgGamemode *mode = ActiveMode(); mode && mode->CanHaveItem())
 		return true;
 
 	return IsAllowedToSpawn(STRING(pEntity->pev->classname));
@@ -933,6 +936,9 @@ void AgGameRules::InitHUD(CBasePlayer *pPlayer)
 	WRITE_BYTE(pPlayer->entindex());
 	WRITE_STRING(pPlayer->GetAuthID());
 	MESSAGE_END();
+
+	if (AgGamemode *mode = ActiveMode())
+		mode->PlayerInitHud(pPlayer);
 }
 
 void AgGameRules::GoToIntermission()
@@ -1031,10 +1037,8 @@ bool AgGameRules::FPlayerCanTakeDamage(CBasePlayer *pPlayer, CBaseEntity *pAttac
 		}
 	}
 
-	if (ARENA == AgGametype())
-		return (m_Arena.CanTakeDamage() && !g_bPaused);
-	else if (LMS == AgGametype())
-		return (m_LMS.CanTakeDamage() && !g_bPaused);
+	if (AgGamemode *mode = ActiveMode())
+		return (mode->CanTakeDamage() && !g_bPaused);
 
 	return !g_bPaused;
 }

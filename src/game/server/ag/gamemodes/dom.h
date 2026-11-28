@@ -8,48 +8,33 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
+#include "ag/gamemode_base.h"
+#include "ag/file_cache.h"
+
 #define DOM_TEAM1_NAME   "blue"
 #define DOM_TEAM2_NAME   "red"
 #define DOM_NEUTRAL_NAME "neutral"
 
-// This is an exact copy of the CTF itterator. Could inherit but for
-// simplicity at this point copying is easier. May tidy this up later :P
-
-class AgDOMFileItemCache;
-class AgDOMFileItem
+class AgDOMFileItem : public AgFileItem
 {
-	char m_szName[32];
-	Vector m_vOrigin;
-	Vector m_vAngles;
-	char m_szData1[64];
-
 public:
-	AgDOMFileItem();
-	virtual ~AgDOMFileItem();
+	char m_szData1[64] = {};
 
-	void Show();
-
-	friend class AgDOMFileItemCache;
+	AgDOMFileItem() = default;
 };
 
-class AgDOMFileItemCache
+class AgDOMFileItemCache : public AgFileItemCache
 {
-	bool m_bInitDone;
-	typedef std::list<AgDOMFileItem *> AgDOMFileItemList;
-	AgDOMFileItemList m_lstFileItems;
-
-	void Load(CBasePlayer *pPlayer = NULL);
-	void Save(CBasePlayer *pPlayer = NULL);
+protected:
+	const char *GetDirectory() const override { return "dom"; }
+	const char *GetExtension() const override { return "dom"; }
+	AgFileItem *CreateItem() override;
+	bool ParseItem(AgFileItem *pItem, const char *pszLine) override;
+	void WriteItem(FILE *pFile, AgFileItem *pItem) override;
+	void OnItemCreated(AgFileItem *pItem, CBaseEntity *pEntity) override;
 
 public:
-	AgDOMFileItemCache();
-	virtual ~AgDOMFileItemCache();
-
-	void Init();
-
-	void Add(const AgString &sItem, CBasePlayer *pPlayer);
-	void Del(CBasePlayer *pPlayer);
-	void List(CBasePlayer *pPlayer);
+	AgDOMFileItemCache() = default;
 };
 
 class AgDOMControlPoint : public CBaseEntity
@@ -75,7 +60,7 @@ private:
 	void Capture(CBasePlayer *pPlayer, const char *szTeamName);
 };
 
-class AgDOM
+class AgDOM : public AgGamemode
 {
 private:
 	int m_iTeam1Score;
@@ -85,14 +70,15 @@ public:
 	AgDOM();
 	virtual ~AgDOM();
 
-	void Think();
+	void Think() override;
 	void ResetControlPoints();
 	bool ScoreLimit(void);
+	bool HasReachedScoreLimit() override { return ScoreLimit(); }
 
-	void ClientDisconnected(CBasePlayer *pPlayer);
-	void ClientConnected(CBasePlayer *pPlayer);
+	void ClientDisconnected(CBasePlayer *pPlayer) override;
+	void ClientConnected(CBasePlayer *pPlayer) override;
 
-	void PlayerInitHud(CBasePlayer *pPlayer);
+	void PlayerInitHud(CBasePlayer *pPlayer) override;
 	void SendControlScores(CBasePlayer *pPlayer);
 
 	AgDOMFileItemCache m_FileItemCache;
