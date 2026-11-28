@@ -8,7 +8,7 @@ target("server")
     add_files(ag.path("src/game/server/wpn_shared/*.cpp"))
     -- agstats needs AGSTATS, glock is built from wpn_shared, the rest is unused.
     remove_files(
-        ag.path("src/game/server/ag/agstats.cpp"),
+        ag.path("src/game/server/ag/statistics.cpp"),
         ag.path("src/game/server/AI_BaseNPC_Schedule.cpp"),
         ag.path("src/game/server/glock.cpp"),
         ag.path("src/game/server/mpstubb.cpp"),

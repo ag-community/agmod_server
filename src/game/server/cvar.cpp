@@ -9,7 +9,7 @@
 #include "extdll.h"
 #include "util.h"
 
-#include "agglobal.h"
+#include "ag/global.h"
 
 #include "cvar.h"
 

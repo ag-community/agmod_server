@@ -38,7 +38,7 @@
 #include "pm_shared.h"
 #include "hltv.h"
 #include "spawnchooser.h"
-#include "agflood.h"
+#include "ag/flood.h"
 #include "speedrunstats.h"
 #include <time.h>
 
@@ -234,7 +234,7 @@ int gmsgCRC32 = 0;
 
 extern std::vector<CBaseEntity *> g_spawnPoints;
 #ifdef AGSTATS
-#include "agstats.h"
+#include "ag/statistics.h"
 #endif
 //-- Martin Webrant
 

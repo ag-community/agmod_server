@@ -31,7 +31,7 @@
 #include "hltv.h"
 
 //++ BulliT
-#include "aggamerules.h"
+#include "ag/rules.h"
 #include "multiplay_gamerules.h"
 
 // extern DLL_GLOBAL CGameRules	*g_pGameRules;

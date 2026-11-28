@@ -24,7 +24,7 @@
 #include "teamplay_gamerules.h"
 //++ BulliT
 #include "multiplay_gamerules.h"
-#include "aggamerules.h"
+#include "ag/rules.h"
 //-- Martin Webrant
 #include "game.h"
 

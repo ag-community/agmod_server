@@ -23,7 +23,7 @@
 #include "gamerules.h"
 //++ BulliT
 #ifdef AGSTATS
-#include "agstats.h"
+#include "ag/statistics.h"
 #endif
 //-- Martin Webrant
 

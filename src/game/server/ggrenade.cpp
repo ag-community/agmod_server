@@ -26,7 +26,7 @@
 #include "nodes.h"
 #include "soundent.h"
 #include "decals.h"
-#include "agglobal.h"
+#include "ag/global.h"
 
 //===================grenade
 

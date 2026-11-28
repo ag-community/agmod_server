@@ -23,7 +23,7 @@
 //++ BulliT
 #if !defined(_SINGLEPLAY_H_)
 #define _SINGLEPLAY_H_
-#include "aggamerules.h"
+#include "ag/rules.h"
 //-- Martin Webrant
 
 //=========================================================

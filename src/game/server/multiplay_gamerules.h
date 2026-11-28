@@ -23,7 +23,7 @@
 //++ BulliT
 #if !defined(_MULTIPLAY_H_)
 #define _MULTIPLAY_H_
-#include "aggamerules.h"
+#include "ag/rules.h"
 //-- Martin Webrant
 
 #define ITEM_RESPAWN_TIME           30

@@ -19,7 +19,7 @@
 //++ BulliT
 #if !defined(_GAMERULES_H_)
 #define _GAMERULES_H_
-#include "agglobal.h"
+#include "ag/global.h"
 //-- Martin Webrant
 // #include "weapons.h"
 // #include "items.h"
@@ -170,7 +170,7 @@ public:
 };
 
 //++ BulliT
-#include "aggamerules.h"
+#include "ag/rules.h"
 extern AgGameRules *InstallGameRules(void);
 //-- Martin Webrant
 

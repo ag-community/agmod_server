@@ -19,7 +19,7 @@
 #include "cvar.h"
 
 //++ BulliT
-#include "agglobal.h"
+#include "ag/global.h"
 //-- Martin Webrant
 AgConVar displaysoundlist("displaysoundlist", "0");
 

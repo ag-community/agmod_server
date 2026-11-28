@@ -19,8 +19,8 @@
 //++ BulliT
 #include "items.h"
 #include "gamerules.h"
-#include "agglobal.h"
-#include "agclient.h"
+#include "ag/global.h"
+#include "ag/player_client.h"
 #include "pm_shared.h"
 extern int gmsgSpectator;
 //-- Martin Webrant

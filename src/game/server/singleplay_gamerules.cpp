@@ -25,7 +25,7 @@
 #include "items.h"
 
 //++ BulliT
-#include "aggamerules.h"
+#include "ag/rules.h"
 #include "multiplay_gamerules.h"
 #include "singleplay_gamerules.h"
 #include "speedrunstats.h"

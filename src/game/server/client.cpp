@@ -43,7 +43,7 @@
 #include "speedrunstats.h"
 
 //++ BulliT
-#include "agglobal.h"
+#include "ag/global.h"
 //-- Martin Webrant
 
 extern DLL_GLOBAL unsigned int g_ulModelIndexPlayer;

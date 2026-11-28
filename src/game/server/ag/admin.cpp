@@ -1,0 +1,20 @@
+//++ BulliT
+
+#include "extdll.h"
+#include "util.h"
+#include "ag/global.h"
+#include "ag/admin.h"
+
+//////////////////////////////////////////////////////////////////////
+// Construction/Destruction
+//////////////////////////////////////////////////////////////////////
+
+AgAdmin::AgAdmin()
+{
+}
+
+AgAdmin::~AgAdmin()
+{
+}
+
+//-- Martin Webrant
