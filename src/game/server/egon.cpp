@@ -24,12 +24,6 @@
 #include "effects.h"
 #include "customentity.h"
 #include "gamerules.h"
-//++ BulliT
-#ifdef AGSTATS
-#include "ag/statistics.h"
-#endif
-//-- Martin Webrant
-
 #define EGON_PRIMARY_VOLUME 450
 #define EGON_BEAM_SPRITE    "sprites/xbeam1.spr"
 #define EGON_FLARE_SPRITE   "sprites/XSpark1.spr"
@@ -550,12 +544,6 @@ void CEgon::EndAttack(void)
 	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.5;
 
 	m_fireState = FIRE_OFF;
-
-	//++ BulliT
-#ifdef AGSTATS
-	Stats.FireShot(m_pPlayer, STRING(pev->classname));
-#endif
-	//-- Martin Webrant
 
 	DestroyEffect();
 }

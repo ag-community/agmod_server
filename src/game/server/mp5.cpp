@@ -22,12 +22,6 @@
 #include "player.h"
 #include "soundent.h"
 #include "gamerules.h"
-//++ BulliT
-#ifdef AGSTATS
-#include "ag/statistics.h"
-#endif
-//-- Martin Webrant
-
 enum mp5_e
 {
 	MP5_LONGIDLE = 0,
@@ -162,10 +156,6 @@ void CMP5::PrimaryAttack()
 	m_pPlayer->m_iWeaponFlash = NORMAL_GUN_FLASH;
 
 	m_iClip--;
-#ifdef AGSTATS
-	Stats.FireShot(m_pPlayer, STRING(pev->classname));
-#endif
-
 	m_pPlayer->pev->effects = (int)(m_pPlayer->pev->effects) | EF_MUZZLEFLASH;
 
 	// player "shoot" animation

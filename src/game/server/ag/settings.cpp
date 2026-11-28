@@ -8,10 +8,6 @@
 #include "ag/global.h"
 #include "ag/settings.h"
 #include "cvar.h"
-#ifdef AGSTATS
-#include "ag/statistics.h"
-#endif
-
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -113,10 +109,6 @@ void AgSettings::Changelevel(const AgString &sMap)
 		g_sNextMap = sMap;
 		g_sNextRules = "";
 		g_pGameRules->GoToIntermission();
-
-#ifdef AGSTATS
-		Stats.OnChangeLevel();
-#endif
 	}
 }
 

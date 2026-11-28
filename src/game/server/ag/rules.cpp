@@ -16,10 +16,6 @@
 #include "ag/flood.h"
 #include "game.h"
 #include "cvar.h"
-#ifdef AGSTATS
-#include "ag/statistics.h"
-#endif
-
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -40,10 +36,6 @@ AgGameRules::AgGameRules()
 	g_bUseTeamColors = teamplay.GetBool();
 	m_sHostname = ConVarRef("hostname").GetString();
 	AdminCache.Load();
-
-#ifdef AGSTATS
-	Stats.Reset();
-#endif
 }
 
 AgGameRules::~AgGameRules()
@@ -161,11 +153,6 @@ bool AgGameRules::ClientCommand(CBasePlayer *pPlayer, const char *pcmd)
 	// Vote?
 	if (m_Vote.HandleCommand(pPlayer))
 		return true;
-
-#ifdef AGSTATS
-	if (Stats.HandleCommand(pPlayer))
-		return true;
-#endif
 
 	// We didn't handle it
 	return false;
@@ -718,11 +705,6 @@ void AgGameRules::PlayerKilled(CBasePlayer *pVictim, entvars_t *pKiller, entvars
 	CBasePlayer *pKillerPlayer = NULL;
 	if (pKillerBE && CLASS_PLAYER == pKillerBE->Classify())
 		pKillerPlayer = ((CBasePlayer *)pKillerBE);
-
-#ifdef AGSTATS
-	if (pKillerPlayer && pVictim)
-		Stats.PlayerKilled(pKillerPlayer, pVictim);
-#endif
 
 	// Update the score cache.
 	m_ScoreCache.UpdateScore(pVictim);

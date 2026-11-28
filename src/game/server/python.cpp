@@ -21,12 +21,6 @@
 #include "monsters.h"
 #include "player.h"
 #include "gamerules.h"
-//++ BulliT
-#ifdef AGSTATS
-#include "ag/statistics.h"
-#endif
-//-- Martin Webrant
-
 #define USE_SCOPE true
 
 enum python_e
@@ -184,10 +178,6 @@ void CPython::PrimaryAttack()
 	m_pPlayer->m_iWeaponFlash = BRIGHT_GUN_FLASH;
 
 	m_iClip--;
-#ifdef AGSTATS
-	Stats.FireShot(m_pPlayer, STRING(pev->classname));
-#endif
-
 	m_pPlayer->pev->effects = (int)(m_pPlayer->pev->effects) | EF_MUZZLEFLASH;
 
 	// player "shoot" animation

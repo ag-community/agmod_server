@@ -234,9 +234,6 @@ int gmsgCTFFlag = 0;
 int gmsgCRC32 = 0;
 
 extern std::vector<CBaseEntity *> g_spawnPoints;
-#ifdef AGSTATS
-#include "ag/statistics.h"
-#endif
 //-- Martin Webrant
 
 void LinkUserMessages(void)
@@ -500,10 +497,6 @@ void CBasePlayer ::TraceAttack(entvars_t *pevAttacker, float flDamage, Vector ve
 		SpawnBlood(ptr->vecEndPos, BloodColor(), flDamage); // a little surface blood.
 		TraceBleed(flDamage, vecDir, ptr, bitsDamageType);
 		AddMultiDamage(pevAttacker, this, flDamage, bitsDamageType);
-
-#ifdef AGSTATS
-		Stats.FireHit(this, flDamage, pevAttacker);
-#endif
 	}
 }
 

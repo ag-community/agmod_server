@@ -27,12 +27,6 @@
 #ifndef CLIENT_DLL
 #include "game.h"
 #endif
-//++ BulliT
-#ifdef AGSTATS
-#include "ag/statistics.h"
-#endif
-//-- Martin Webrant
-
 #define GAUSS_PRIMARY_CHARGE_VOLUME 256 // how loud gauss is while charging
 #define GAUSS_PRIMARY_FIRE_VOLUME   450 // how loud gauss is when discharged
 
@@ -469,10 +463,6 @@ void CGauss::Fire(Vector vecOrigSrc, Vector vecDir, float flDamage)
 	if (SGBOW == AgGametype())
 		return;
 
-#ifdef AGSTATS
-	Stats.FireShot(m_pPlayer, STRING(pev->classname));
-#endif
-	//-- Martin Webrant
 	while (flDamage > 10 && nMaxHits > 0)
 	{
 		nMaxHits--;

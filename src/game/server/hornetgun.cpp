@@ -23,12 +23,6 @@
 #include "player.h"
 #include "hornet.h"
 #include "gamerules.h"
-//++ BulliT
-#ifdef AGSTATS
-#include "ag/statistics.h"
-#endif
-//-- Martin Webrant
-
 enum hgun_e
 {
 	HGUN_IDLE1 = 0,
@@ -159,12 +153,6 @@ void CHgun::PrimaryAttack()
 #endif
 
 	m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
-//++ BulliT
-#ifdef AGSTATS
-	Stats.FireShot(m_pPlayer, STRING(pev->classname));
-#endif
-	//-- Martin Webrant
-
 	m_pPlayer->m_iWeaponVolume = QUIET_GUN_VOLUME;
 	m_pPlayer->m_iWeaponFlash = DIM_GUN_FLASH;
 
@@ -259,12 +247,6 @@ void CHgun::SecondaryAttack(void)
 #endif
 
 	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usHornetFire, 0.0, (float *)&g_vecZero, (float *)&g_vecZero, 0.0, 0.0, FIREMODE_FAST, 0, 0, 0);
-
-//++ BulliT
-#ifdef AGSTATS
-	Stats.FireShot(m_pPlayer, STRING(pev->classname));
-#endif
-	//-- Martin Webrant
 
 	m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
 	m_pPlayer->m_iWeaponVolume = NORMAL_GUN_VOLUME;

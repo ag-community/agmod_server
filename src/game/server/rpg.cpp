@@ -22,12 +22,6 @@
 #include "nodes.h"
 #include "player.h"
 #include "gamerules.h"
-//++ BulliT
-#ifdef AGSTATS
-#include "ag/statistics.h"
-#endif
-//-- Martin Webrant
-
 enum rpg_e
 {
 	RPG_IDLE = 0,
@@ -498,12 +492,6 @@ void CRpg::PrimaryAttack()
 #endif
 
 		m_iClip--;
-
-		//++ BulliT
-#ifdef AGSTATS
-		Stats.FireShot(m_pPlayer, STRING(pev->classname));
-#endif
-		//-- Martin Webrant
 
 		m_flNextPrimaryAttack = GetNextAttackDelay(1.5);
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.5;

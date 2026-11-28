@@ -23,12 +23,6 @@
 #include "player.h"
 #include "gamerules.h"
 #include "game.h"
-//++ BulliT
-#ifdef AGSTATS
-#include "ag/statistics.h"
-#endif
-//-- Martin Webrant
-
 #define CROWBAR_BODYHIT_VOLUME 128
 #define CROWBAR_WALLHIT_VOLUME 512
 
@@ -166,12 +160,6 @@ void CCrowbar::SwingAgain(void)
 
 int CCrowbar::Swing(int fFirst)
 {
-//++ BulliT
-#ifdef AGSTATS
-	Stats.FireShot(m_pPlayer, STRING(pev->classname));
-#endif
-	//-- Martin Webrant
-
 	int fDidHit = false;
 
 	TraceResult tr;
