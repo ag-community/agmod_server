@@ -1,11 +1,6 @@
 //++ BulliT
 
-#if !defined(AFX_AGCOMMANDS_H__B6D8EF5B_9423_4422_B935_1D71B6146DCA__INCLUDED_)
-#define AFX_AGCOMMANDS_H__B6D8EF5B_9423_4422_B935_1D71B6146DCA__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include "ag/global.h"
 #include <algorithm>
@@ -55,5 +50,4 @@ public:
 
 extern DLL_GLOBAL AgCommand Command;
 
-#endif // !defined(AFX_AGCOMMANDS_H__B6D8EF5B_9423_4422_B935_1D71B6146DCA__INCLUDED_)
 //-- Martin Webrant

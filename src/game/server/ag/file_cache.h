@@ -1,5 +1,4 @@
-#ifndef AG_GAMEMODE_FILE_CACHE_H
-#define AG_GAMEMODE_FILE_CACHE_H
+#pragma once
 
 #include <cstdio>
 #include <list>
@@ -49,5 +48,3 @@ public:
 	void Del(CBasePlayer *pPlayer);
 	void List(CBasePlayer *pPlayer);
 };
-
-#endif

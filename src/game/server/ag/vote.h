@@ -1,11 +1,6 @@
 //++ BulliT
 
-#if !defined(AFX_AGVOTE_H__9CC79DD3_49A1_42BF_8757_9F250760B2BD__INCLUDED_)
-#define AFX_AGVOTE_H__9CC79DD3_49A1_42BF_8757_9F250760B2BD__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 class AgVote
 {
@@ -44,7 +39,5 @@ public:
 
 	bool ResetVote();
 };
-
-#endif // !defined(AFX_AGVOTE_H__9CC79DD3_49A1_42BF_8757_9F250760B2BD__INCLUDED_)
 
 //-- Martin Webrant

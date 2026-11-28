@@ -1,5 +1,4 @@
-#ifndef AG_GAMEMODE_ROUND_STATE_H
-#define AG_GAMEMODE_ROUND_STATE_H
+#pragma once
 
 #include "ag/global.h"
 
@@ -24,5 +23,3 @@ public:
 	void SendCountdown(int iSeconds, const char *pszPlayer1 = "", const char *pszPlayer2 = "");
 	void SendCountdownStop();
 };
-
-#endif

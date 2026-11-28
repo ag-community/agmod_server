@@ -1,11 +1,6 @@
 //++ BulliT
 
-#if !defined(AFX_AGTIMEOUT_H__699E98F5_E1CB_4F41_8492_F741C0450C4D__INCLUDED_)
-#define AFX_AGTIMEOUT_H__699E98F5_E1CB_4F41_8492_F741C0450C4D__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 class AgTimeout
 {
@@ -34,7 +29,5 @@ public:
 	void Reset();
 	void TogglePause(enumState State = DisablePause);
 };
-
-#endif // !defined(AFX_AGTIMEOUT_H__699E98F5_E1CB_4F41_8492_F741C0450C4D__INCLUDED_)
 
 //-- Martin Webrant

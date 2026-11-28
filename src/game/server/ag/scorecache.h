@@ -1,11 +1,6 @@
 //++ BulliT
 
-#if !defined(AFX_AGSCORECACHE_H__92DDA4B4_AB28_483B_8028_FAAB0667ECD4__INCLUDED_)
-#define AFX_AGSCORECACHE_H__92DDA4B4_AB28_483B_8028_FAAB0667ECD4__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include "ag/score.h"
 #include <map>
@@ -27,7 +22,5 @@ public:
 	void RestoreInGame(CBasePlayer *pPlayer); // Restore ingame flag from the scorecache.
 	void Reset(); // Reset it.
 };
-
-#endif // !defined(AFX_AGSCORECACHE_H__92DDA4B4_AB28_483B_8028_FAAB0667ECD4__INCLUDED_)
 
 //-- Martin Webrant

@@ -1,5 +1,4 @@
-#ifndef CONVAR_H
-#define CONVAR_H
+#pragma once
 
 #include <algorithm>
 
@@ -127,5 +126,3 @@ public:
 	static ConVar *FindCvar(const char *name);
 	static ConVar *FindCvar(cvar_t *cvar);
 };
-
-#endif

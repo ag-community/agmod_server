@@ -1,5 +1,4 @@
-#ifndef AG_GAMEMODE_MODE_H
-#define AG_GAMEMODE_MODE_H
+#pragma once
 
 #include "extdll.h"
 
@@ -22,5 +21,3 @@ public:
 	virtual bool CanHaveItem() { return false; }
 	virtual bool HasReachedScoreLimit() { return false; }
 };
-
-#endif

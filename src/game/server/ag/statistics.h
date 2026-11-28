@@ -1,11 +1,6 @@
 //++ BulliT
 
-#if !defined(__AG_STATS__)
-#define __AG_STATS__
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include "ag/global.h"
 
@@ -77,7 +72,5 @@ public:
 };
 
 extern DLL_GLOBAL AgStats Stats;
-
-#endif // !defined(__AG_STATS__)
 
 //-- Martin Webrant

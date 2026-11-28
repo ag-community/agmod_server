@@ -1,12 +1,7 @@
 //++ muphicks
 // AGDomination mode header file
 
-#if !defined(__AG_DOM_H__)
-#define __AG_DOM_H__
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include "ag/gamemode_base.h"
 #include "ag/file_cache.h"
@@ -83,5 +78,3 @@ public:
 
 	AgDOMFileItemCache m_FileItemCache;
 };
-
-#endif // !defined(__AG_DOM_H__)

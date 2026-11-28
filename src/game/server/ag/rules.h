@@ -1,11 +1,6 @@
 //++ BulliT
 
-#if !defined(AFX_AGGAMERULES_H__5F634943_35DD_4A80_922F_A0A82C815D99__INCLUDED_)
-#define AFX_AGGAMERULES_H__5F634943_35DD_4A80_922F_A0A82C815D99__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include "ag/scorecache.h"
 #include "ag/admincache.h"
@@ -103,7 +98,5 @@ public:
 	AgSuddenDeath m_SuddenDeath;
 	AgTimeout m_Timeout;
 };
-
-#endif // !defined(AFX_AGGAMERULES_H__5F634943_35DD_4A80_922F_A0A82C815D99__INCLUDED_)
 
 //-- Martin Webrant

@@ -1,7 +1,6 @@
 //++ BulliT
 
-#if !defined(_AG_GLOBAL_H_)
-#define _AG_GLOBAL_H_
+#pragma once
 
 #pragma warning(disable : 4786)
 #pragma warning(disable : 4530)
@@ -315,7 +314,5 @@ bool IsNukeAllowed(entvars_t *pevInflictor);
 void ReseedSpawnSystem();
 
 float GetCountdownTimeOrDefault(float defaultValue);
-
-#endif // !defined(_AG_GLOBAL_H_)
 
 //-- Martin Webrant

@@ -2,12 +2,7 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#if !defined(__AG_CTF_H__)
-#define __AG_CTF_H__
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include "ag/gamemode_base.h"
 #include "ag/round_state.h"
@@ -105,5 +100,3 @@ private:
 	void Precache(void);
 	void Think(void);
 };
-
-#endif // !defined(__AG_CTF_H__)

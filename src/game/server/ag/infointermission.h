@@ -1,11 +1,6 @@
 //++ BulliT
 
-#if !defined(AFX_AGINFOINTERMISSION_H__92743C98_BDED_4776_ABE6_7FDAA798F87E__INCLUDED_)
-#define AFX_AGINFOINTERMISSION_H__92743C98_BDED_4776_ABE6_7FDAA798F87E__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 class AgInfoIntermission
 {
@@ -43,7 +38,5 @@ inline edict_t *AgInfoIntermission::GetRandomSpot()
 
 	return GetSpot(RANDOM_LONG(0, GetCount() - 1));
 }
-
-#endif // !defined(AFX_AGINFOINTERMISSION_H__92743C98_BDED_4776_ABE6_7FDAA798F87E__INCLUDED_)
 
 //-- Martin Webrant

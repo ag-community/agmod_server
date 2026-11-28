@@ -2,12 +2,7 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#if !defined(AFX_AGARENA_H__1929C55A_3034_4C89_8398_1F8243B83499__INCLUDED_)
-#define AFX_AGARENA_H__1929C55A_3034_4C89_8398_1F8243B83499__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include "ag/gamemode_base.h"
 #include "ag/round_state.h"
@@ -69,5 +64,3 @@ inline bool AgArena::CanHaveItem()
 {
 	return AgRoundState::Spawning == m_Round.m_Status;
 }
-
-#endif // !defined(AFX_AGARENA_H__1929C55A_3034_4C89_8398_1F8243B83499__INCLUDED_)

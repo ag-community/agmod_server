@@ -1,11 +1,6 @@
 //++ BulliT
 
-#if !defined(AFX_AGTIMER_H__699E98F5_E1CB_4F41_8492_F741C0450C4D__INCLUDED_)
-#define AFX_AGTIMER_H__699E98F5_E1CB_4F41_8492_F741C0450C4D__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 class AgTimer
 {
@@ -47,7 +42,5 @@ inline float AgTimer::GetEffectiveTime()
 	return m_fEffectiveTime;
 }
 extern bool g_bPaused;
-
-#endif // !defined(AFX_AGTIMER_H__699E98F5_E1CB_4F41_8492_F741C0450C4D__INCLUDED_)
 
 //-- Martin Webrant

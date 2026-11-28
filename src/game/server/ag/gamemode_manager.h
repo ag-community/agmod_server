@@ -1,11 +1,6 @@
 //++ BulliT
 
-#if !defined(AG_GAMEMODE_MANAGER_H)
-#define AG_GAMEMODE_MANAGER_H
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include "ag/global.h"
 
@@ -78,5 +73,4 @@ inline byte AgGametype()
 	return g_GameType;
 };
 
-#endif // !defined(AG_GAMEMODE_MANAGER_H)
 //-- Martin Webrant

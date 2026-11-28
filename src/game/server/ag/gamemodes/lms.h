@@ -2,12 +2,7 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#if !defined(__AG_LMS_H__)
-#define __AG_LMS_H__
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include "ag/gamemode_base.h"
 #include "ag/round_state.h"
@@ -33,5 +28,3 @@ inline bool AgLMS::CanTakeDamage()
 {
 	return AgRoundState::Playing == m_Round.m_Status;
 }
-
-#endif // !defined(__AG_LMS_H__)

@@ -1,5 +1,4 @@
-#ifndef AG_CVAR_H
-#define AG_CVAR_H
+#pragma once
 
 #include <map>
 #include <string>
@@ -62,5 +61,3 @@ public:
 private:
 	int m_CustomFlags;
 };
-
-#endif
