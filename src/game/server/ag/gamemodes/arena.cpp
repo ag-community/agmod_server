@@ -9,7 +9,7 @@
 
 #include "ag/rules.h"
 #include "ag/global.h"
-#include "ag/arena.h"
+#include "ag/gamemodes/arena.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

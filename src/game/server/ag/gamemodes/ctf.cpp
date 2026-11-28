@@ -9,7 +9,7 @@
 
 #include "ag/rules.h"
 #include "ag/global.h"
-#include "ag/ctf.h"
+#include "ag/gamemodes/ctf.h"
 #include "spawnchooser.h"
 
 //////////////////////////////////////////////////////////////////////

@@ -11,7 +11,7 @@
 
 #include "ag/rules.h"
 #include "ag/global.h"
-#include "ag/dom.h"
+#include "ag/gamemodes/dom.h"
 
 #include <list>
 

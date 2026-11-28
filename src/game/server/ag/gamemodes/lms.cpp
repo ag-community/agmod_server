@@ -9,7 +9,7 @@
 
 #include "ag/rules.h"
 #include "ag/global.h"
-#include "ag/lms.h"
+#include "ag/gamemodes/lms.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

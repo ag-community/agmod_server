@@ -5,6 +5,7 @@ target("server")
 
     add_files(ag.path("src/game/server/*.cpp"))
     add_files(ag.path("src/game/server/ag/*.cpp"))
+    add_files(ag.path("src/game/server/ag/gamemodes/*.cpp"))
     add_files(ag.path("src/game/server/wpn_shared/*.cpp"))
     -- agstats needs AGSTATS, glock is built from wpn_shared, the rest is unused.
     remove_files(
